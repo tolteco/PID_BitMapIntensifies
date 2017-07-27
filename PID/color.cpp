@@ -1,5 +1,5 @@
 #include "color.h"
-
+/*
 //destructor
 myPoly::~myPoly() {}
 
@@ -8,7 +8,7 @@ float myPoly::getWidth() {return width;}
 float myPoly::getHeight() {return height;}
 
 void myPoly::setHeight(const float & w) {width = w;}
-void myPoly::setWidth(const float & h) {height = h;}
+void myPoly::setWidth(const float & h) {height = h;}*/
 
 void Color::setRed  (unsigned char newRed){
     red = newRed;

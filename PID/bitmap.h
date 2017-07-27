@@ -6,6 +6,9 @@
 class BitMap : public Image {
     public:
         BitMap();
+
+    private:
+
 };
 
 #endif
