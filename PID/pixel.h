@@ -3,12 +3,12 @@
 
 class Pixel{
     public:
-        Color(unsigned char first8,
+        Pixel(unsigned char first8,
               unsigned char second8,
               unsigned char third8Bits):
             first(red8Bits), second(green8Bits), third(blue8Bits){}
 
-        virtual ~Color() {};
+        virtual ~Pixel() {};
 
         ///SET CHANNELS
         void set1st (unsigned char new1st);
