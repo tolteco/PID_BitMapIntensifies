@@ -1,28 +1,35 @@
-#ifndef COLOR_H
-#define COLOR_H
+#ifndef PIXEL_H
+#define PIXEL_H
 
 class Pixel{
     public:
-        Color(unsigned char red8Bits,
-              unsigned char green8Bits,
-              unsigned char blue8Bits):
-            red(red8Bits), green(green8Bits), blue(blue8Bits){}
+        Color(unsigned char first8,
+              unsigned char second8,
+              unsigned char third8Bits):
+            first(red8Bits), second(green8Bits), third(blue8Bits){}
 
-        ~Color();
+        virtual ~Color() {};
 
-        void setRed  (unsigned char newRed);
-        void setGreen(unsigned char newGreen);
-        void setBlue (unsigned char newBlue);
-        unsigned char getRed();
-        unsigned char getGreen();
-        unsigned char getBlue();
+        ///SET CHANNELS
+        void set1st (unsigned char new1st);
+        void set2nd (unsigned char new2nd);
+        void set3rd (unsigned char new3rd);
+        unsigned char get1st();
+        unsigned char get2nd();
+        unsigned char get3rd();
 
     private:
-        SpatialDistance*  spatialClass;
-        TemporalDistance* temporalClass;
-        unsigned char red;
-        unsigned char green;
-        unsigned char blue;
+        unsigned char first;
+        unsigned char second;
+        unsigned char third;
+};
+
+class RGBColor : public Pixel{
+
+};
+
+class YUVColor : public Pixel{
+
 };
 
 #endif
