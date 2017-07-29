@@ -11,7 +11,7 @@ Image::Image(Pixel** map_of_pixels,
                blue_bits(blue_bits) {}
 
 //destructor
-Image::~Image() {}
+//Image::~Image() {}
 
 ///GETTERS
 

@@ -1,12 +1,15 @@
 #ifndef PIXEL_H
 #define PIXEL_H
 
+#include <iostream>
+
 class Pixel{
     public:
+        Pixel() {};
         Pixel(unsigned char first8,
               unsigned char second8,
-              unsigned char third8Bits):
-            first(red8Bits), second(green8Bits), third(blue8Bits){}
+              unsigned char third8):
+            first(first8), second(second8), third(third8){}
 
         virtual ~Pixel() {};
 
@@ -18,10 +21,14 @@ class Pixel{
         unsigned char get2nd();
         unsigned char get3rd();
 
+        friend std::ostream& operator<<(std::ostream &os, Pixel const &m);
+
     private:
         unsigned char first;
         unsigned char second;
         unsigned char third;
+
+
 };
 
 class RGBColor : public Pixel{

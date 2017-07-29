@@ -12,9 +12,9 @@ class Image{
               unsigned char green_bits,
               unsigned char blue_bits);
 
-        virtual ~Image();
-        virtual void writeToFile(char* filename);
-        virtual Image readFromFile(char* filename);
+        //virtual ~Image() = 0;
+        //virtual void writeToFile(char* filename) = 0;
+        //virtual Image readFromFile(char* filename) = 0;
 
         ///GETTERS
         Pixel getPixel(unsigned int i, unsigned int j);

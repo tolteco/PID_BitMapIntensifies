@@ -18,7 +18,7 @@ void Pixel::set2nd(unsigned char newSecond){
     second = newSecond;
 }
 
-void Pixel::set3rd() (unsigned char newThird){
+void Pixel::set3rd (unsigned char newThird){
     third = newThird;
 }
 
@@ -32,4 +32,11 @@ unsigned char Pixel::get2nd(){
 
 unsigned char Pixel::get3rd(){
     return third;
+}
+
+std::ostream &operator<<(std::ostream &os, Pixel const &m) {
+    return os << '(' <<
+    m.first   << ',' <<
+    m.second  << ',' <<
+    m.third   << ')' ;
 }
