@@ -34,11 +34,12 @@ void transpose(Pixel *src, Pixel *dst, const int N, const int M) {
 }
 
 void MatrixOperation::transposeMatrix (Pixel* src, Pixel* dst, const unsigned int lines, const unsigned int columns){
-    if(lines%BLOCK_SIZE==0 && columns%BLOCK_SIZE==0){
+    /*if(lines%BLOCK_SIZE==0 && columns%BLOCK_SIZE==0){
+        //This method seems to be slower...
         int lda = ROUND_UP(columns, BLOCK_SIZE);
         int ldb = ROUND_UP(lines, BLOCK_SIZE);
         transpose_block(src, dst, lines, columns, lda, ldb, BLOCK_SIZE); //Block tem que ser múltiplo, 3*5=15
-    } else {
+    } else {*/{
         transpose(src, dst, lines, columns);
     }
 }

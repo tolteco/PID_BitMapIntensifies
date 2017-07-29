@@ -29,10 +29,9 @@ void print(Pixel* mat, int lines, int cols){
 int main() {
     if (omp_get_max_threads() > OMP_THREADS)
         omp_set_num_threads(OMP_THREADS);
-    cout << "Hello world!" << endl;
 
-    const int lines = 720;
-    const int columns = 480;
+    /*const int lines = 1920;
+    const int columns = 1088;
     #define ROUND_UP(x, s) (((x)+((s)-1)) & -(s))
     //int lda = ROUND_UP(columns, 16);
     //int ldb = ROUND_UP(lines, 16);
@@ -46,7 +45,7 @@ int main() {
     MatrixOperation m = MatrixOperation();
     m.transposeMatrix(mat, matB, lines, columns);
     cout << "Transpose\n";
-    //print(matB, lda, ldb);
+    //print(matB, lda, ldb);*/
     return 0;
 }
 

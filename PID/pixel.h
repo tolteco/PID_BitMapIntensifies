@@ -11,9 +11,9 @@ class Pixel{
               unsigned char third8):
             first(first8), second(second8), third(third8){}
 
+        Pixel(const Pixel &old);
         virtual ~Pixel() {};
 
-        ///SET CHANNELS
         void set1st (unsigned char new1st);
         void set2nd (unsigned char new2nd);
         void set3rd (unsigned char new3rd);
@@ -21,14 +21,21 @@ class Pixel{
         unsigned char get2nd();
         unsigned char get3rd();
 
-        friend std::ostream& operator<<(std::ostream &os, Pixel const &m);
+        /// Operators
+        Pixel& operator++(); //++Pixel
+        Pixel  operator++(int); //Pixel++
+        Pixel& operator--(); //--Pixel
+        Pixel  operator--(int); //Pixel--
+        Pixel  operator+(const Pixel& b); //this + b
+        Pixel  operator-(const Pixel& b); //this - b
+        //bool   operator<(const Pixel& lhs, const Pixel& rhs);
+
+    friend std::ostream& operator<<(std::ostream &os, Pixel const &m);
 
     private:
         unsigned char first;
         unsigned char second;
         unsigned char third;
-
-
 };
 
 class RGBColor : public Pixel{
