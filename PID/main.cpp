@@ -30,7 +30,7 @@ int main() {
     if (omp_get_max_threads() > OMP_THREADS)
         omp_set_num_threads(OMP_THREADS);
 
-    /*const int lines = 1920;
+    const int lines = 1920;
     const int columns = 1088;
     #define ROUND_UP(x, s) (((x)+((s)-1)) & -(s))
     //int lda = ROUND_UP(columns, 16);
@@ -45,24 +45,39 @@ int main() {
     MatrixOperation m = MatrixOperation();
     m.transposeMatrix(mat, matB, lines, columns);
     cout << "Transpose\n";
-    //print(matB, lda, ldb);*/
+    //print(matB, lda, ldb);
     return 0;
 }
 
 
 
-/* USEFUL LINKS
-
+/* C++ Links
 https://stackoverflow.com/questions/11747954/c-inheritance-in-separate-files-using-include-and-inclusion-guards
 
 https://stackoverflow.com/questions/12854778/abstract-class-vs-interface-in-c
 
 https://stackoverflow.com/questions/318064/how-do-you-declare-an-interface-in-c
 
+https://stackoverflow.com/questions/4421706/what-are-the-basic-rules-and-idioms-for-operator-overloading
+
+https://stackoverflow.com/questions/32810252/return-this-or-this-in-operator-overloading
+
 */
 
 /* MAYBE USEFUL IN THE NEAR FUTURE LINKS
 
 https://stackoverflow.com/questions/874298/c-templates-that-accept-only-certain-types
+
+https://stackoverflow.com/questions/500493/c-equivalent-of-instanceof
+
+*/
+
+/* IMAGE RELATED LINKS
+
+https://en.wikipedia.org/wiki/YUV
+
+http://www.equasys.de/colorconversion.html
+
+
 
 */
