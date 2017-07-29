@@ -80,6 +80,7 @@ Pixel Pixel::operator--(int){
     return newP;
 }
 
+//this + b
 Pixel Pixel::operator+(const Pixel& b) {
      Pixel px;
      unsigned short f = this->first + b.first;
@@ -97,19 +98,37 @@ Pixel Pixel::operator+(const Pixel& b) {
      return px;
 }
 
+//this - b
 Pixel Pixel::operator-(const Pixel& b) {
      Pixel px;
-     short f = this->first + b.first;
+     short f = this->first - b.first;
      if (f > 0) px.first = (unsigned char) f;
      else       px.first = 0;
 
-     f = this->second + b.second;
+     f = this->second - b.second;
      if (f > 0) px.second = (unsigned char) f;
      else       px.second = 0;
 
-     f = this->third + b.third;
+     f = this->third - b.third;
      if (f > 0) px.third = (unsigned char) f;
      else       px.third = 0;
+
+     return px;
+}
+
+Pixel Pixel::operator*(const Pixel& b) {
+     Pixel px;
+     unsigned short f = this->first * b.first;
+     if (f < 255) px.first = (unsigned char) f;
+     else         px.first = 255;
+
+     f = this->second * b.second;
+     if (f < 255) px.second = (unsigned char) f;
+     else         px.second = 255;
+
+     f = this->third * b.third;
+     if (f < 255) px.third = (unsigned char) f;
+     else         px.third = 255;
 
      return px;
 }

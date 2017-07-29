@@ -16,7 +16,8 @@ class Image{
              unsigned char blue_bits,
              Pixel* map_of_pixels);
 
-        //Image(const Image &old);
+        //Image(const Image &old); //If define this, follow RULE OF THREE
+        //https://stackoverflow.com/questions/4172722/what-is-the-rule-of-three
 
         //virtual ~Image() = 0;
         //virtual void writeToFile(char* filename) = 0;
@@ -38,8 +39,12 @@ class Image{
         void setVerticalResolution(unsigned int);
 
         /// Operators
-        Image  operator+(const Image& b); //this + b
-        Image  operator-(const Image& b); //this - b
+        Image operator+(const Image& b); //this + b
+        Image operator-(const Image& b); //this - b
+        Image operator*(const Image& b); //this * b
+        Image operator+(const Pixel& constant); //this + constant (Every pixel + constant)
+        Image operator-(const Pixel& constant); //this - constant (Every pixel - constant)
+        Image operator*(const Pixel& constant); //this * constant (Every pixel * constant)
 
     friend std::ostream& operator<<(std::ostream &os, Image const &m);
 

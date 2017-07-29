@@ -22,7 +22,7 @@ Image::Image(unsigned int lines, unsigned int columns,
 ///GETTERS
 
 Pixel Image::getPixel(unsigned int i, unsigned int j) const{
-    return pixelMap[i*this->no_columns+j];
+    return Pixel(pixelMap[i*this->no_columns+j]);
 }
 
 unsigned int Image::getLines(){
@@ -78,6 +78,9 @@ std::ostream &operator<<(std::ostream &os, Image const &m) {
     return os;
 }
 
+//Maybe we could use this as a wrapper to
+//a generic function with a functor that operates
+//between pixels? Nah. (Juliano).
 Image Image::operator+(const Image& b) {
     /* E se as imagens forem de tamanhos
     diferentes? A imagem LHS nunca terá
@@ -120,3 +123,52 @@ Image Image::operator-(const Image& b) {
     return px;
 }
 
+Image Image::operator*(const Image& b) {
+    Image px = Image(*this);
+    unsigned int cols = this->no_columns;
+    for (unsigned int i=0; i<this->no_lines; i++){
+        for (unsigned int j=0; j<cols; j++){
+            if( (i<b.no_lines) && (j<b.no_columns) ){
+                px.pixelMap[i*cols+j] = this->getPixel(i,j) * b.getPixel(i,j);
+            }
+        }
+    }
+
+    return px;
+}
+
+Image Image::operator+(const Pixel& constant) {
+    Image px = Image(*this);
+    unsigned int cols = this->no_columns;
+    for (unsigned int i=0; i<this->no_lines; i++){
+        for (unsigned int j=0; j<cols; j++){
+            px.pixelMap[i*cols+j] = this->getPixel(i,j) + constant;
+        }
+    }
+
+    return px;
+}
+
+Image Image::operator-(const Pixel& constant) {
+    Image px = Image(*this);
+    unsigned int cols = this->no_columns;
+    for (unsigned int i=0; i<this->no_lines; i++){
+        for (unsigned int j=0; j<cols; j++){
+            px.pixelMap[i*cols+j] = this->getPixel(i,j) - constant;
+        }
+    }
+
+    return px;
+}
+
+Image Image::operator*(const Pixel& constant) {
+    Image px = Image(*this);
+    unsigned int cols = this->no_columns;
+    for (unsigned int i=0; i<this->no_lines; i++){
+        for (unsigned int j=0; j<cols; j++){
+            px.pixelMap[i*cols+j] = this->getPixel(i,j) * constant;
+        }
+    }
+
+    return px;
+}

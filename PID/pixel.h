@@ -28,6 +28,7 @@ class Pixel{
         Pixel  operator--(int); //Pixel--
         Pixel  operator+(const Pixel& b); //this + b
         Pixel  operator-(const Pixel& b); //this - b
+        Pixel  operator*(const Pixel& b); //this - b
         //bool   operator<(const Pixel& lhs, const Pixel& rhs);
 
     friend std::ostream& operator<<(std::ostream &os, Pixel const &m);
