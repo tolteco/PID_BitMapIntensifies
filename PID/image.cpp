@@ -238,58 +238,53 @@ int BMP::readFromFile(char* FileName){
     if(BMPHdr.Type != (('M' << 8) | 'B')) return -1;
 
     Pixel *mat  = (Pixel*)_mm_malloc(sizeof(Pixel)*BMPInfHdr.biHeight*BMPInfHdr.biWidth, 64);
-    //if(mat == nullptr) return -1;
-std::cout<<"third step\n";
-    RGBQUAD palette_rs[256];
+    /*RGBQUAD palette_rs[256];
     int offset = BMPHdr.OffsetBits;
     if (offset != 54){ //Tem paleta
         offset -= 54;
         offset /= 4;
 
         InputStream.read((char*)&palette_rs, sizeof(RGBQUAD)*offset);
-    }
-std::cout<<"fourth step\n";
+    }*/
+
     MiscMath mscm; ///Generalizar para diferente de True color
     unsigned int linePixels = BMPInfHdr.biWidth;
     unsigned int lineBytes = mscm.roundUpToNearestMultiple(linePixels*3, 4);
-    Pixel* lineBuffer = new Pixel[linePixels];
-    char* spareBytes;
-    unsigned int no_spare_bytes = lineBytes - (linePixels*3);
-    if (no_spare_bytes != 0){
-        spareBytes = new char[no_spare_bytes];
-    }
-std::cout<<"fifth step\n";
-    ///std::copy(map_of_pixels, map_of_pixels+(lines*columns), pixelMap);
-    unsigned int i;
-    unsigned int pixelCount=0;
-    for(i=0; i<BMPInfHdr.biHeight; i++){ //Read lines
-        InputStream.read((char*)&lineBuffer, sizeof(Pixel)*linePixels);
-        std::cout<<"read\n";
-        if (no_spare_bytes != 0){ //Read spare bytes
-           InputStream.read(spareBytes, sizeof(char)*no_spare_bytes);
-           std::cout<<"ins\n";
-        }
-        std::cout<<"after\n";
-        std::reverse(lineBuffer, lineBuffer+linePixels);
-        std::cout<<"rev " << BMPInfHdr.biHeight << "\n";
-        //std::copy(lineBuffer, lineBuffer+linePixels, mat+pixelCount);
-        //std::copy(std::begin(lineBuffer), std::end(lineBuffer), mat+pixelCount);
-        pixelCount += linePixels;
-        //std::cout<<"iter\n";
-    }
-std::cout<<"sixth step\n";
-    delete[] lineBuffer;
-    if (no_spare_bytes != 0) delete[] spareBytes;
 
-    //CONSTRUIR NOVA INSTÂNCIA BMP
+    RGBTRI lineBuffer[linePixels];
+    unsigned int no_spare_bytes = lineBytes - (linePixels*3);
+    char spareBytes[no_spare_bytes];
+
+    unsigned int i,j;
+    unsigned int cols = BMPInfHdr.biWidth;
+    for(i=0; i<BMPInfHdr.biHeight; i++){ //Read lines
+        InputStream.read((char*)&lineBuffer, sizeof(lineBuffer));
+
+        if (no_spare_bytes != 0){ //Read spare bytes
+           InputStream.read((char*)&spareBytes, sizeof(spareBytes));
+        }
+        for (j=0; j<cols; j++){ //Freaking std::reverse(std::begin(lineBuffer), std::end(lineBuffer));
+            RGBTRI bgrP = lineBuffer[linePixels-j-1];
+            mat[i*cols+j] = Pixel(bgrP.rgbRed, bgrP.rgbGreen, bgrP.rgbBlue);
+        }
+    }
+
+    Image::pixelMap = mat;
     file_header = BMPHdr;
     info_header = BMPInfHdr;
-    if (no_spare_bytes != 0)
-        for (i=0; i<256; i++)
-            palette[i] = Pixel(palette_rs[i].rgbRed, palette_rs[i].rgbGreen, palette_rs[i].rgbBlue);
-std::cout<<"seventh step\n";
-    fromBGRtoRGB();
 
+    Image::no_lines = info_header.biHeight;
+    Image::no_columns = info_header.biWidth;
+
+    Image::red_bits   = 8;
+    Image::green_bits = 8;
+    Image::blue_bits  = 8;
+
+    /*if (BMPHdr.OffsetBits != 54)
+        for (i=0; i<256; i++)
+            palette[i] = Pixel(palette_rs[i].rgbRed, palette_rs[i].rgbGreen, palette_rs[i].rgbBlue);*/
+
+    //fromBGRtoRGB();
     return 0;
 }
 
@@ -304,10 +299,11 @@ void swapUCHAR(unsigned char *a, unsigned char *b){
     *b = temp;
 }
 
-void BMP::fromBGRtoRGB(){
+void BMP::swap1stAnd3rdChannels(){
     //stuff
-    unsigned int lines = this->getLines();
-    unsigned int cols = this->getColumns();
+    unsigned int lines = this->Image::getLines();
+    unsigned int cols = this->Image::getColumns();
+
     unsigned char first, third;
     for (unsigned int i=0; i<lines; i++){
         for (unsigned int j=0; j<cols; j++){
@@ -319,12 +315,7 @@ void BMP::fromBGRtoRGB(){
         }
     }
 
-    isBGR = false;
-}
-
-void BMP::fromRGBtoBGR(){
-    //stuff
-    isBGR = true;
+    isBGR = ( isBGR ? false : true); //swap bool value
 }
 
 std::ostream &operator<<(std::ostream &os, BMP const &m) {

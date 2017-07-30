@@ -49,7 +49,8 @@ void test1(){
 void test2(){
     char* name = "Tucano.bmp";
     BMP imag = BMP();
-    imag.readFromFile(name);
+    int i=imag.readFromFile(name);
+    cout << "AHHHHHHHHHHHHHHHH: " << i << endl;
     cout << imag;
 }
 

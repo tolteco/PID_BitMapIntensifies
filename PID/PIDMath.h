@@ -2,6 +2,7 @@
 #define PIDMATH_H
 
 #include "pixel.h"
+#include "image.h"
 
 #define BLOCK_SIZE 16
 #define ROUND_UP(x, s) (((x)+((s)-1)) & -(s))
@@ -20,6 +21,11 @@ class MatrixOperation{
 class MiscMath{
 public:
     unsigned int roundUpToNearestMultiple(unsigned int num, unsigned int multiple);
+};
+
+class Quantization{
+public:
+    Image medianCut2ndAnd3rdChannels(Image img, unsigned short maxColors);
 };
 
 #endif

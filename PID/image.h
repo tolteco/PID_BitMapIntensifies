@@ -34,6 +34,14 @@ typedef struct tagRGBQUAD {
 #pragma pack(pop)
 
 #pragma pack(push, 1)
+typedef struct tagRGBTRI {
+    BYTE rgbBlue;
+    BYTE rgbGreen;
+    BYTE rgbRed;
+}RGBTRI;
+#pragma pack(pop)
+
+#pragma pack(push, 1)
 typedef struct tagBITMAPINFOHEADER {
     DWORD biSize;
     DWORD biWidth;
@@ -122,6 +130,7 @@ class PersistableIMG : public Image {
 //REF. NOTAS DE AULA DE PID :D
 class BMP : public PersistableIMG {
     public:
+        BMP() {};
         enum BiCompress_E {
             BI_RGB  = 0, //Sem compressao
             BI_RLE8 = 1, //RLE 8 bits
@@ -138,10 +147,9 @@ class BMP : public PersistableIMG {
         BITMAPINFO info;
         BITMAPINFOHEADER info_header;
         Pixel palette[256];
-        bool isBGR = true;
+        bool isBGR = false;
 
-        void fromBGRtoRGB();  //BMP armazenados em BGR
-        void fromRGBtoBGR();
+        void swap1stAnd3rdChannels();  //BMP armazenados em BGR
         //void reorderBMPcolumns(); //Armazena-se primeiro a ultima coluna da primeira linha
 };
 
