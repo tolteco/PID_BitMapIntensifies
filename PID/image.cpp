@@ -225,83 +225,21 @@ Image Image::operator*(const Pixel& constant) {
     return TRUE;
 }*/
 
-/*int BMP::readFromFile(char* FileName){
-    FILE *filePtr; //our file pointer
-    BITMAPFILEHEADER bitmapFileHeader; //our bitmap file header
-    unsigned char *bitmapImage;  //store image data
-    int imageIdx=0;  //image index counter
-    unsigned char tempRGB;  //our swap variable
-
-    //open filename in read binary mode
-    filePtr = fopen(filename,"rb");
-    if (filePtr == NULL)
-        return NULL;
-
-    //read the bitmap file header
-    fread(&bitmapFileHeader, sizeof(BITMAPFILEHEADER),1,filePtr);
-
-    //verify that this is a bmp file by check bitmap id
-    if (bitmapFileHeader.bfType !=0x4D42)
-    {
-        fclose(filePtr);
-        return NULL;
-    }
-
-    //read the bitmap info header
-    fread(bitmapInfoHeader, sizeof(BITMAPINFOHEADER),1,filePtr); // small edit. forgot to add the closing bracket at sizeof
-
-    //move file point to the begging of bitmap data
-    fseek(filePtr, bitmapFileHeader.bfOffBits, SEEK_SET);
-
-    //allocate enough memory for the bitmap image data
-    bitmapImage = (unsigned char*)malloc(bitmapInfoHeader->biSizeImage);
-
-    //verify memory allocation
-    if (!bitmapImage)
-    {
-        free(bitmapImage);
-        fclose(filePtr);
-        return NULL;
-    }
-
-    //read in the bitmap image data
-    fread(bitmapImage,bitmapInfoHeader->biSizeImage,filePtr);
-
-    //make sure bitmap image data was read
-    if (bitmapImage == NULL)
-    {
-        fclose(filePtr);
-        return NULL;
-    }
-
-    //swap the r and b values to get RGB (bitmap is BGR)
-    for (imageIdx = 0;imageIdx < bitmapInfoHeader->biSizeImage;imageIdx+=3) // fixed semicolon
-    {
-        tempRGB = bitmapImage[imageIdx];
-        bitmapImage[imageIdx] = bitmapImage[imageIdx + 2];
-        bitmapImage[imageIdx + 2] = tempRGB;
-    }
-
-    //close file and return bitmap iamge data
-    fclose(filePtr);
-    return bitmapImage;
-}*/
-
 int BMP::readFromFile(char* FileName){
     std::ifstream InputStream(FileName, std::ios::in | std::ios::binary);
     if(!InputStream) return 0;
 
     BITMAPFILEHEADER BMPHdr;
     BITMAPINFOHEADER BMPInfHdr;
-    InputStream.read((char*)&BMPHdr, sizeof(BITMAPFILEHEADER));
-    InputStream.read((char*)&BMPInfHdr, sizeof(BITMAPINFOHEADER));
+    InputStream.read(reinterpret_cast<char *>(&BMPHdr), sizeof(BITMAPFILEHEADER));
+    InputStream.read(reinterpret_cast<char *>(&BMPInfHdr), sizeof(BITMAPINFOHEADER));
 
     // Verifica se formato da imagem é aceitável (deve ser ‘BM’)
     if(BMPHdr.Type != (('M' << 8) | 'B')) return -1;
 
     Pixel *mat  = (Pixel*)_mm_malloc(sizeof(Pixel)*BMPInfHdr.biHeight*BMPInfHdr.biWidth, 64);
-    if(mat == nullptr) return -1;
-
+    //if(mat == nullptr) return -1;
+std::cout<<"third step\n";
     RGBQUAD palette_rs[256];
     int offset = BMPHdr.OffsetBits;
     if (offset != 54){ //Tem paleta
@@ -310,7 +248,7 @@ int BMP::readFromFile(char* FileName){
 
         InputStream.read((char*)&palette_rs, sizeof(RGBQUAD)*offset);
     }
-
+std::cout<<"fourth step\n";
     MiscMath mscm; ///Generalizar para diferente de True color
     unsigned int linePixels = BMPInfHdr.biWidth;
     unsigned int lineBytes = mscm.roundUpToNearestMultiple(linePixels*3, 4);
@@ -320,31 +258,75 @@ int BMP::readFromFile(char* FileName){
     if (no_spare_bytes != 0){
         spareBytes = new char[no_spare_bytes];
     }
-
+std::cout<<"fifth step\n";
     ///std::copy(map_of_pixels, map_of_pixels+(lines*columns), pixelMap);
     unsigned int i;
     unsigned int pixelCount=0;
     for(i=0; i<BMPInfHdr.biHeight; i++){ //Read lines
         InputStream.read((char*)&lineBuffer, sizeof(Pixel)*linePixels);
+        std::cout<<"read\n";
         if (no_spare_bytes != 0){ //Read spare bytes
            InputStream.read(spareBytes, sizeof(char)*no_spare_bytes);
+           std::cout<<"ins\n";
         }
+        std::cout<<"after\n";
         std::reverse(lineBuffer, lineBuffer+linePixels);
-        //std::reverse(std::begin(lineBuffer), std::end(lineBuffer));
-        std::copy(lineBuffer, lineBuffer+linePixels, mat+pixelCount);
+        std::cout<<"rev " << BMPInfHdr.biHeight << "\n";
+        //std::copy(lineBuffer, lineBuffer+linePixels, mat+pixelCount);
         //std::copy(std::begin(lineBuffer), std::end(lineBuffer), mat+pixelCount);
         pixelCount += linePixels;
+        //std::cout<<"iter\n";
     }
-
+std::cout<<"sixth step\n";
     delete[] lineBuffer;
     if (no_spare_bytes != 0) delete[] spareBytes;
 
-
     //CONSTRUIR NOVA INSTÂNCIA BMP
+    file_header = BMPHdr;
+    info_header = BMPInfHdr;
+    if (no_spare_bytes != 0)
+        for (i=0; i<256; i++)
+            palette[i] = Pixel(palette_rs[i].rgbRed, palette_rs[i].rgbGreen, palette_rs[i].rgbBlue);
+std::cout<<"seventh step\n";
+    fromBGRtoRGB();
 
     return 0;
 }
 
 int BMP::writeToFile(char* FileName){
     return -1;
+}
+
+void swapUCHAR(unsigned char *a, unsigned char *b){
+    unsigned char temp;
+    temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+void BMP::fromBGRtoRGB(){
+    //stuff
+    unsigned int lines = this->getLines();
+    unsigned int cols = this->getColumns();
+    unsigned char first, third;
+    for (unsigned int i=0; i<lines; i++){
+        for (unsigned int j=0; j<cols; j++){
+            first = Image::pixelMap[i*cols+j].get1st();
+            third = Image::pixelMap[i*cols+j].get3rd();
+            swapUCHAR(&first, &third);
+            Image::pixelMap[i*cols+j].set1st(first);
+            Image::pixelMap[i*cols+j].set3rd(third);
+        }
+    }
+
+    isBGR = false;
+}
+
+void BMP::fromRGBtoBGR(){
+    //stuff
+    isBGR = true;
+}
+
+std::ostream &operator<<(std::ostream &os, BMP const &m) {
+    return os << m.info_header.biWidth << "x" << m.info_header.biHeight;;
 }

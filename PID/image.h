@@ -14,21 +14,26 @@ typedef unsigned short WORD;
 typedef unsigned int DWORD;
 typedef unsigned long QWORD;
 
+#pragma pack(push, 1)
 typedef struct tagBITMAPFILEHEADER {
     WORD  Type;
     DWORD Size;
     WORD  Reserved;
     WORD  Reserved2;
     DWORD OffsetBits;
-}__attribute__((packed)) BITMAPFILEHEADER;
+}BITMAPFILEHEADER;
+#pragma pack(pop)
 
+#pragma pack(push, 1)
 typedef struct tagRGBQUAD {
     BYTE rgbBlue;
     BYTE rgbGreen;
     BYTE rgbRed;
     BYTE rgbReserved;
-}__attribute__((packed)) RGBQUAD;
+}RGBQUAD;
+#pragma pack(pop)
 
+#pragma pack(push, 1)
 typedef struct tagBITMAPINFOHEADER {
     DWORD biSize;
     DWORD biWidth;
@@ -41,7 +46,8 @@ typedef struct tagBITMAPINFOHEADER {
     DWORD biYPelsPerMeter;
     DWORD biClrUsed;
     DWORD biClrImportant;
-}__attribute__((packed)) BITMAPINFOHEADER;
+}BITMAPINFOHEADER;
+#pragma pack(pop)
 
 typedef struct tagBITMAPINFO {
     BITMAPINFOHEADER bmiHeader;
@@ -93,7 +99,7 @@ class Image{
 
     friend std::ostream& operator<<(std::ostream &os, Image const &m);
 
-    private:
+    protected:
         unsigned int no_lines;
         unsigned int no_columns;
 
@@ -105,17 +111,16 @@ class Image{
         unsigned int pixels_meter_vertical;
 
         Pixel* pixelMap;
-        ///DEFINE VIRTUAL OPERATOR+ FOR IMAGE SUM IN CHILD CLASSES
 };
 
-class PersistableIMG : Image {
+class PersistableIMG : public Image {
     public:
         virtual int writeToFile (char* FileName) = 0;
         virtual int readFromFile(char* FileName) = 0;
 };
 
 //REF. NOTAS DE AULA DE PID :D
-class BMP : PersistableIMG {
+class BMP : public PersistableIMG {
     public:
         enum BiCompress_E {
             BI_RGB  = 0, //Sem compressao
@@ -126,18 +131,22 @@ class BMP : PersistableIMG {
         int readFromFile(char* FileName);
         int writeToFile (char* FileName);
 
+    friend std::ostream& operator<<(std::ostream &os, BMP const &m);
+
     private:
         BITMAPFILEHEADER file_header;
         BITMAPINFO info;
         BITMAPINFOHEADER info_header;
-        Pixel palette[255];
+        Pixel palette[256];
+        bool isBGR = true;
 
         void fromBGRtoRGB();  //BMP armazenados em BGR
-        void reorderBMPcolumns(); //Armazena-se primeiro a ultima coluna da primeira linha
+        void fromRGBtoBGR();
+        //void reorderBMPcolumns(); //Armazena-se primeiro a ultima coluna da primeira linha
 };
 
 //Formato próprio - Mapa de BiTs - MBT
-class MBT : PersistableIMG {
+class MBT : public PersistableIMG {
     public:
         //https://stackoverflow.com/questions/8771881/setting-multiple-attributes-for-enum-structure
         enum Reserved_FH {

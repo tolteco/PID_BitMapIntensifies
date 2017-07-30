@@ -3,6 +3,7 @@
 #include <array>
 #include "PIDMath.h"
 #include "pixel.h"
+#include "image.h"
 
 #define OMP_THREADS 4
 using namespace std;
@@ -26,10 +27,7 @@ void print(Pixel* mat, int lines, int cols){
     }
 }
 
-int main() {
-    if (omp_get_max_threads() > OMP_THREADS)
-        omp_set_num_threads(OMP_THREADS);
-
+void test1(){
     const int lines = 1920;
     const int columns = 1088;
     #define ROUND_UP(x, s) (((x)+((s)-1)) & -(s))
@@ -46,6 +44,20 @@ int main() {
     m.transposeMatrix(mat, matB, lines, columns);
     cout << "Transpose\n";
     //print(matB, lda, ldb);
+}
+
+void test2(){
+    char* name = "Tucano.bmp";
+    BMP imag = BMP();
+    imag.readFromFile(name);
+    cout << imag;
+}
+
+int main() {
+    if (omp_get_max_threads() > OMP_THREADS)
+        omp_set_num_threads(OMP_THREADS);
+
+    test2();
     return 0;
 }
 
