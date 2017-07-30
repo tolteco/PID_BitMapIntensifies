@@ -17,4 +17,9 @@ class MatrixOperation{
 
 };
 
+class MiscMath{
+public:
+    unsigned int roundUpToNearestMultiple(unsigned int num, unsigned int multiple);
+};
+
 #endif

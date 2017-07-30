@@ -1,10 +1,57 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
+///Explosion warning:
+/*  Usar os typedefs do header
+"windows.h" faz com que as estruturas
+do BMP (Com o mesmo nome que as abaixo)
+também sejam incluídas. Possíveis
+problemas de desalinhamento.
+*/
+
+typedef unsigned char BYTE;
+typedef unsigned short WORD;
+typedef unsigned int DWORD;
+typedef unsigned long QWORD;
+
+typedef struct tagBITMAPFILEHEADER {
+    WORD  Type;
+    DWORD Size;
+    WORD  Reserved;
+    WORD  Reserved2;
+    DWORD OffsetBits;
+}__attribute__((packed)) BITMAPFILEHEADER;
+
+typedef struct tagRGBQUAD {
+    BYTE rgbBlue;
+    BYTE rgbGreen;
+    BYTE rgbRed;
+    BYTE rgbReserved;
+}__attribute__((packed)) RGBQUAD;
+
+typedef struct tagBITMAPINFOHEADER {
+    DWORD biSize;
+    DWORD biWidth;
+    DWORD biHeight;
+    WORD  biPlanes;
+    WORD  biBitCount;
+    DWORD biCompression;
+    DWORD biSizeImage;
+    DWORD biXPelsPerMeter;
+    DWORD biYPelsPerMeter;
+    DWORD biClrUsed;
+    DWORD biClrImportant;
+}__attribute__((packed)) BITMAPINFOHEADER;
+
+typedef struct tagBITMAPINFO {
+    BITMAPINFOHEADER bmiHeader;
+    RGBQUAD bmiColors[1];
+}__attribute__((packed)) BITMAPINFO;
+
 #include <iostream>
 #include "pixel.h"
 
-#define MAX_BM_PRINT 10
+#define MAX_BM_PRINT 10 //Se linhas ou colunas for maior que isso, o operador << nao retorna stream com print
 
 ///CLASSE PRINCIPAL PARA CALCULOS
 class Image{
@@ -20,8 +67,6 @@ class Image{
         //https://stackoverflow.com/questions/4172722/what-is-the-rule-of-three
 
         //virtual ~Image() = 0;
-        //virtual void writeToFile(char* filename) = 0;
-        //virtual Image readFromFile(char* filename) = 0;
 
         ///GETTERS
         Pixel getPixel(unsigned int i, unsigned int j) const;
@@ -63,32 +108,42 @@ class Image{
         ///DEFINE VIRTUAL OPERATOR+ FOR IMAGE SUM IN CHILD CLASSES
 };
 
+class PersistableIMG : Image {
+    public:
+        virtual int writeToFile (char* FileName) = 0;
+        virtual int readFromFile(char* FileName) = 0;
+};
+
 //REF. NOTAS DE AULA DE PID :D
-class BMP : Image {
+class BMP : PersistableIMG {
     public:
         enum BiCompress_E {
-            BI_RGB  = 0; //Sem compressao
-            BI_RLE8 = 1; //RLE 8 bits
-            BI_RLE4 = 2; //RLE 4 bits
-        }
+            BI_RGB  = 0, //Sem compressao
+            BI_RLE8 = 1, //RLE 8 bits
+            BI_RLE4 = 2 //RLE 4 bits
+        };
+
+        int readFromFile(char* FileName);
+        int writeToFile (char* FileName);
 
     private:
         BITMAPFILEHEADER file_header;
         BITMAPINFO info;
         BITMAPINFOHEADER info_header;
-        BYTE* reserved_map;
+        Pixel palette[255];
 
-
+        void fromBGRtoRGB();  //BMP armazenados em BGR
+        void reorderBMPcolumns(); //Armazena-se primeiro a ultima coluna da primeira linha
 };
 
 //Formato próprio - Mapa de BiTs - MBT
-class MBT : Image {
+class MBT : PersistableIMG {
     public:
         //https://stackoverflow.com/questions/8771881/setting-multiple-attributes-for-enum-structure
         enum Reserved_FH {
-            YUV = 0; //Armazenado em YUV
-            RGB = 1; //Armazenado em RGB
-        }
+            YUV = 0, //Armazenado em YUV
+            RGB = 1  //Armazenado em RGB
+        };
 
         ///Campo reservado2 do BMP pode ser usado para
         ///quando tempos num de bits diferentes entre
@@ -101,38 +156,6 @@ class MBT : Image {
 
 };
 
-typedef struct tagBITMAPFILEHEADER {
-    WORD Type;
-    DWORD Size;
-    WORD Reserved;
-    WORD Reserved2;
-    DWORD OffsetBits;
-} BITMAPFILEHEADER;
 
-typedef struct tagBITMAPINFO {
-    BITMAPINFOHEADER bmiHeader;
-    RGBQUAD bmiColors[1];
-} BITMAPINFO;
-
-typedef struct tagBITMAPINFOHEADER {
-    DWORD biSize;
-    DWORD biWidth;
-    DWORD biHeight;
-    WORD biPlanes;
-    WORD biBitCount;
-    DWORD biCompression;
-    DWORD biSizeImage;
-    DWORD biXPelsPerMeter;
-    DWORD biYPelsPerMeter;
-    DWORD biClrUsed;
-    DWORD biClrImportant;
-} BITMAPINFOHEADER;
-
-typedef struct tagRGBQUAD {
-    BYTE rgbBlue;
-    BYTE rgbGreen;
-    BYTE rgbRed;
-    BYTE rgbReserved;
-} RGBQUAD;
 
 #endif

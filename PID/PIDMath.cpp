@@ -44,9 +44,19 @@ void MatrixOperation::transposeMatrix (Pixel* src, Pixel* dst, const unsigned in
     }
 }
 
-void multiply(Pixel* mat, const unsigned int lines,     const unsigned int columns,
+void MatrixOperation::multiply(Pixel* mat, const unsigned int lines,     const unsigned int columns,
             double* mult, const unsigned int multLines, const unsigned int multColumns){
 
 
 }
 
+unsigned int MiscMath::roundUpToNearestMultiple(unsigned int num, unsigned int multiple){
+    if (multiple == 0)
+        return num;
+
+    int remainder = num % multiple;
+    if (remainder == 0)
+        return num;
+
+    return num + multiple - remainder;
+}
