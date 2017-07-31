@@ -1,4 +1,5 @@
 #include <omp.h>
+#include <math.h>
 #include <iostream>
 //#include <xmmintrin.h>
 #include "PIDMath.h"
@@ -61,64 +62,125 @@ unsigned int MiscMath::roundUpToNearestMultiple(unsigned int num, unsigned int m
     return num + multiple - remainder;
 }
 
-#include <cstring>
+#include <vector>
+#include <algorithm>
 
-//F: http://www.geeksforgeeks.org/counting-sort/
-void countSort(char arr[]){
-    #define RANGE 256
-
-    // The output character array that will have sorted arr
-    char output[strlen(arr)];
-
-    // Create a count array to store count of inidividul
-    // characters and initialize count array as 0
-    int countt[RANGE + 1], i;
-    memset(countt, 0, sizeof(countt));
-
-    // Store count of each character
-    for(i = 0; arr[i]; ++i)
-        ++countt[arr[i]];
-
-    // Change count[i] so that count[i] now contains actual
-    // position of this character in output array
-    for (i = 1; i <= RANGE; ++i)
-        countt[i] += countt[i-1];
-
-    // Build the output character array
-    for (i = 0; arr[i]; ++i)
-    {
-        output[countt[arr[i]]-1] = arr[i];
-        --countt[arr[i]];
-    }
-
-    // Copy the output array to arr, so that arr now
-    // contains sorted characters
-    for (i = 0; arr[i]; ++i)
-        arr[i] = output[i];
+void swapCHAR(unsigned char *a, unsigned char *b){
+    unsigned char temp;
+    temp = *a;
+    *a = *b;
+    *b = temp;
 }
 
-#include <map>
+//http://www.vogella.com/tutorials/JavaAlgorithmsQuicksort/article.html
+void quick_sort(std::vector<unsigned char>* f_arr, std::vector<unsigned char>* s_arr, std::vector<unsigned char>* t_arr, int beg, int end, char chnl){
+        unsigned char pivot;
+        if      (chnl == 0) pivot = f_arr->at(beg + (end-beg)/2);
+        else if (chnl == 1) pivot = s_arr->at(beg + (end-beg)/2);
+        else                pivot = f_arr->at(beg + (end-beg)/2);
+
+        int begC = beg,
+            endC = end;
+
+        while(begC <= endC){
+            unsigned char b_p, e_p;
+            if      (chnl == 0){ b_p = f_arr->at(begC); e_p = f_arr->at(endC);}
+            else if (chnl == 1){ b_p = s_arr->at(begC); e_p = s_arr->at(endC);}
+            else{                b_p = t_arr->at(begC); e_p = t_arr->at(endC);}
+
+            while(b_p < pivot) ++begC;
+            while(e_p > pivot) --endC;
+
+            if (begC <= endC){
+                iter_swap(f_arr->begin() + begC, f_arr->begin() + endC);
+                iter_swap(s_arr->begin() + begC, s_arr->begin() + endC);
+                iter_swap(t_arr->begin() + begC, t_arr->begin() + endC);
+                ++begC;
+                --endC;
+            }
+        }
+
+        if (beg < endC) quick_sort(f_arr, s_arr, t_arr, beg, endC, chnl);
+        if (begC < end) quick_sort(f_arr, s_arr, t_arr, begC, end, chnl);
+}
+
+int chnl_range(std::vector<unsigned char> arr1){
+    auto minmax1 = std::minmax_element(arr1.begin(), arr1.end());
+    return arr1.at(minmax1.second - arr1.begin()) - arr1.at(minmax1.first - arr1.begin());
+}
+
+char chnl_with_greatest_range(std::vector<unsigned char> arr1, std::vector<unsigned char> arr2){
+    auto minmax1 = std::minmax_element(arr1.begin(), arr1.end());
+    auto minmax2 = std::minmax_element(arr2.begin(), arr2.end());
+
+    int range1 = arr1.at(minmax1.second - arr1.begin()) - arr1.at(minmax1.first - arr1.begin());
+    int range2 = arr2.at(minmax2.second - arr2.begin()) - arr2.at(minmax2.first - arr2.begin());
+
+    if (range1 > range2) return 1;
+    else return 2;
+}
+
+char chnl_list_with_greatest_range(std::vector<std::vector<unsigned char>> arr1, std::vector<std::vector<unsigned char>> arr2){
+    int range1 = chnl_range(arr1.at(0)),
+        range2 = chnl_range(arr2.at(0));
+
+    int rangeTemp1, rangeTemp2;
+
+    return 5;
+    /*for (int i=1; i<arr1.size(); i++){
+
+    }*/
+}
+
 Image Quantization::medianCut2ndAnd3rdChannels(Image img, unsigned short maxColors){
     unsigned int lines = img.getLines();
     unsigned int cols = img.getColumns();
 
-    //first Channel
-    char fChnl [lines*cols];
-    char sChnl [lines*cols];
-    char tChnl [lines*cols];
+    std::vector<unsigned char> chnl_1, chnl_2, chnl_3;
+    chnl_1.reserve(lines*cols); chnl_2.reserve(lines*cols); chnl_3.reserve(lines*cols);
+    //temp second Channel
     for(unsigned int i=0; i<lines; i++){
         for (unsigned int j=0; j<cols; j++){
-            fChnl[i*cols+j] = img.getPixel(i, j).get1st();
-            sChnl[i*cols+j] = img.getPixel(i, j).get2nd();
-            tChnl[i*cols+j] = img.getPixel(i, j).get3rd();
+            Pixel p = img.getPixel(i,j);
+            chnl_1.push_back(p.get1st());
+            chnl_2.push_back(p.get2nd());
+            chnl_3.push_back(p.get3rd());
         }
     }
-    countSort(fChnl); countSort(sChnl); countSort(tChnl);
+    ///http://blog.isamert.net/median-cut-algorithm-in-qt-c/
 
-    unsigned int range1 = fChnl[(lines*cols)-1] - fChnl[0];
-    unsigned int range2 = sChnl[(lines*cols)-1] - sChnl[0];
-    unsigned int range3 = tChnl[(lines*cols)-1] - tChnl[0];
+    //http://www.cplusplus.com/forum/general/833/
+    std::vector<std::vector<unsigned char>> f_lists, s_lists, t_lists;
+    f_lists.push_back(chnl_1);
+    s_lists.push_back(chnl_2);
+    t_lists.push_back(chnl_3);
 
+    while(f_lists.size() < maxColors){ //Main loop
+        //char biggest_range = chnl_with_greatest_range()
+        unsigned int lists_size = f_lists.size(); //Para não reavaliar e dividir listas igualitariamente
+        for (unsigned int i=0; i<lists_size; i++){ //Para todas as listas, verifica qual tem o maior range e ordena
+            char b_range = chnl_with_greatest_range(s_lists.at(i), t_lists.at(i)); //Canal com maior range
+            quick_sort(&f_lists.at(i), &s_lists.at(i), &t_lists.at(i), 0, f_lists.size()-1, b_range); //Sort de acordo com o canal
 
+            std::vector<unsigned char> temp = f_lists.at(i);
+            std::vector<unsigned char> f_2(temp.begin(), temp.begin() + temp.size()/2),
+                                       f_3(temp.begin() + temp.size()/2, temp.end());
+            f_lists.erase(f_lists.begin()+i); f_lists.push_back(f_2); f_lists.push_back(f_3);
+
+            std::vector<unsigned char> temp2 = s_lists.at(i);
+            std::vector<unsigned char> t_2(temp2.begin(), temp2.begin() + temp2.size()/2),
+                                       t_3(temp2.begin() + temp2.size()/2, temp2.end());
+            s_lists.erase(s_lists.begin()+i); s_lists.push_back(s_2); f_lists.push_back(s_3);
+
+            std::vector<unsigned char> temp3 = t_lists.at(i);
+            std::vector<unsigned char> t_2(temp3.begin(), temp3.begin() + temp3.size()/2),
+                                       t_3(temp3.begin() + temp3.size()/2, temp3.end());
+            t_lists.erase(t_lists.begin()+i); t_lists.push_back(t_2); t_lists.push_back(t_3);
+        }
+    }
+
+    std::vector<Pixel> palette;
+    palette.reserve(maxColors);
+    //Percorre todas as listas pegando o elemento mediano ( pos(size/2) )
 
 }

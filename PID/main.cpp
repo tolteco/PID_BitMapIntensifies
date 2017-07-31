@@ -1,5 +1,6 @@
 #include <omp.h>
 #include <iostream>
+#include <algorithm>
 #include <array>
 #include "PIDMath.h"
 #include "pixel.h"
@@ -54,11 +55,36 @@ void test2(){
     cout << imag;
 }
 
+#include <vector>
+#include <iterator>
+int test3(vector<int>arr1, vector<int>arr2){
+    //vector<int>arr1{1,2,3,-1,-2,-3};
+    //vector<int>arr2{1,2,3,-1,-2,-4};
+    auto minmax1 = std::minmax_element(arr1.begin(), arr1.end());
+    auto minmax2 = std::minmax_element(arr2.begin(), arr2.end());
+
+    int range1 = arr1.at(minmax1.second - arr1.begin()) - arr1.at(minmax1.first - arr1.begin());
+    int range2 = arr2.at(minmax2.second - arr2.begin()) - arr2.at(minmax2.first - arr2.begin());
+
+    cout<<endl;
+    cout<<range1<<endl;
+    cout<<range2<<endl;
+
+    if (range1 > range2) return 1;
+    else return 2;
+}
+
+void test4(vector<int>*arr1){
+    iter_swap(arr1->begin() + 0, arr1->begin() + 3);
+}
+
 int main() {
     if (omp_get_max_threads() > OMP_THREADS)
         omp_set_num_threads(OMP_THREADS);
 
-    test2();
+    vector<int>arr1{1,2,3,-1,-2,-3};
+    vector<int>arr2{1,2,3,-1,-2,-4};
+
     return 0;
 }
 

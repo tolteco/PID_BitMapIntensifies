@@ -319,5 +319,5 @@ void BMP::swap1stAnd3rdChannels(){
 }
 
 std::ostream &operator<<(std::ostream &os, BMP const &m) {
-    return os << m.info_header.biWidth << "x" << m.info_header.biHeight;;
+    return os << m.info_header.biWidth << "x" << m.info_header.biHeight;
 }
