@@ -72,36 +72,27 @@ void swapCHAR(unsigned char *a, unsigned char *b){
     *b = temp;
 }
 
+
 //http://www.vogella.com/tutorials/JavaAlgorithmsQuicksort/article.html
-void quick_sort(std::vector<unsigned char>* f_arr, std::vector<unsigned char>* s_arr, std::vector<unsigned char>* t_arr, int beg, int end, char chnl){
-        unsigned char pivot;
-        if      (chnl == 0) pivot = f_arr->at(beg + (end-beg)/2);
-        else if (chnl == 1) pivot = s_arr->at(beg + (end-beg)/2);
-        else                pivot = f_arr->at(beg + (end-beg)/2);
+void quick_sort(std::vector<Pixel>* arr, int beg, int end, char chnl){
+        Pixel pivot = arr->at(beg + (end-beg)/2);
 
         int begC = beg,
             endC = end;
 
         while(begC <= endC){
-            unsigned char b_p, e_p;
-            if      (chnl == 0){ b_p = f_arr->at(begC); e_p = f_arr->at(endC);}
-            else if (chnl == 1){ b_p = s_arr->at(begC); e_p = s_arr->at(endC);}
-            else{                b_p = t_arr->at(begC); e_p = t_arr->at(endC);}
-
-            while(b_p < pivot) ++begC;
-            while(e_p > pivot) --endC;
+            while(arr->at(begC).moreThan(pivot, chnl)) ++begC;
+            while(arr->at(endC).lessThan(pivot, chnl)) --endC;
 
             if (begC <= endC){
-                iter_swap(f_arr->begin() + begC, f_arr->begin() + endC);
-                iter_swap(s_arr->begin() + begC, s_arr->begin() + endC);
-                iter_swap(t_arr->begin() + begC, t_arr->begin() + endC);
+                iter_swap(arr->begin() + begC, arr->begin() + endC);
                 ++begC;
                 --endC;
             }
         }
 
-        if (beg < endC) quick_sort(f_arr, s_arr, t_arr, beg, endC, chnl);
-        if (begC < end) quick_sort(f_arr, s_arr, t_arr, begC, end, chnl);
+        if (beg < endC) quick_sort(arr, beg, endC, chnl);
+        if (begC < end) quick_sort(arr, begC, end, chnl);
 }
 
 int chnl_range(std::vector<unsigned char> arr1){
@@ -120,67 +111,66 @@ char chnl_with_greatest_range(std::vector<unsigned char> arr1, std::vector<unsig
     else return 2;
 }
 
-char chnl_list_with_greatest_range(std::vector<std::vector<unsigned char>> arr1, std::vector<std::vector<unsigned char>> arr2){
-    int range1 = chnl_range(arr1.at(0)),
-        range2 = chnl_range(arr2.at(0));
+char chnl_with_greatest_range(std::vector<Pixel> arr){
+    std::vector<unsigned char> chnl_1, chnl_2;
+    chnl_1.reserve(arr.size()); chnl_2.reserve(arr.size());
+    for (unsigned int i=0; i<arr.size(); i++){
+        Pixel p = arr.at(i);
+        chnl_1.push_back(p.get2nd());
+        chnl_2.push_back(p.get3rd());
+    }
 
-    int rangeTemp1, rangeTemp2;
+    int range1 = chnl_range(chnl_1),
+        range2 = chnl_range(chnl_2);
 
-    return 5;
-    /*for (int i=1; i<arr1.size(); i++){
-
-    }*/
+    if (range1 > range2) return 1;
+    else return 2;
 }
 
 Image Quantization::medianCut2ndAnd3rdChannels(Image img, unsigned short maxColors){
     unsigned int lines = img.getLines();
     unsigned int cols = img.getColumns();
 
-    std::vector<unsigned char> chnl_1, chnl_2, chnl_3;
-    chnl_1.reserve(lines*cols); chnl_2.reserve(lines*cols); chnl_3.reserve(lines*cols);
-    //temp second Channel
+    std::vector<Pixel> pixels;
+    pixels.reserve(lines*cols);
     for(unsigned int i=0; i<lines; i++){
         for (unsigned int j=0; j<cols; j++){
-            Pixel p = img.getPixel(i,j);
-            chnl_1.push_back(p.get1st());
-            chnl_2.push_back(p.get2nd());
-            chnl_3.push_back(p.get3rd());
+            pixels.push_back(img.getPixel(i,j));
         }
     }
+std::cout << "Pixels postos no primeiro vector\n";
     ///http://blog.isamert.net/median-cut-algorithm-in-qt-c/
-
     //http://www.cplusplus.com/forum/general/833/
-    std::vector<std::vector<unsigned char>> f_lists, s_lists, t_lists;
-    f_lists.push_back(chnl_1);
-    s_lists.push_back(chnl_2);
-    t_lists.push_back(chnl_3);
+    std::vector<std::vector<Pixel>> p_lists;
+    p_lists.push_back(pixels);
+std::cout << "Pixels postos no vector de vectors\n";
+    while(p_lists.size() < maxColors){ //Main loop
 
-    while(f_lists.size() < maxColors){ //Main loop
-        //char biggest_range = chnl_with_greatest_range()
-        unsigned int lists_size = f_lists.size(); //Para não reavaliar e dividir listas igualitariamente
-        for (unsigned int i=0; i<lists_size; i++){ //Para todas as listas, verifica qual tem o maior range e ordena
-            char b_range = chnl_with_greatest_range(s_lists.at(i), t_lists.at(i)); //Canal com maior range
-            quick_sort(&f_lists.at(i), &s_lists.at(i), &t_lists.at(i), 0, f_lists.size()-1, b_range); //Sort de acordo com o canal
+        unsigned int lists_size = p_lists.size();
+std::cout << "Size: " << lists_size << "\n";
+        for (unsigned int i=0; i<lists_size; lists_size--){
+            char b_range = chnl_with_greatest_range(p_lists.at(i)); //Canal com maior range
+            quick_sort(&p_lists.at(i), 0, p_lists.at(i).size()-1, b_range); //Sort de acordo com o canal
 
-            std::vector<unsigned char> temp = f_lists.at(i);
-            std::vector<unsigned char> f_2(temp.begin(), temp.begin() + temp.size()/2),
-                                       f_3(temp.begin() + temp.size()/2, temp.end());
-            f_lists.erase(f_lists.begin()+i); f_lists.push_back(f_2); f_lists.push_back(f_3);
-
-            std::vector<unsigned char> temp2 = s_lists.at(i);
-            std::vector<unsigned char> t_2(temp2.begin(), temp2.begin() + temp2.size()/2),
-                                       t_3(temp2.begin() + temp2.size()/2, temp2.end());
-            s_lists.erase(s_lists.begin()+i); s_lists.push_back(s_2); f_lists.push_back(s_3);
-
-            std::vector<unsigned char> temp3 = t_lists.at(i);
-            std::vector<unsigned char> t_2(temp3.begin(), temp3.begin() + temp3.size()/2),
-                                       t_3(temp3.begin() + temp3.size()/2, temp3.end());
-            t_lists.erase(t_lists.begin()+i); t_lists.push_back(t_2); t_lists.push_back(t_3);
+            std::vector<Pixel> temp = p_lists.at(i);
+            std::vector<Pixel> f_2(temp.begin(), temp.begin() + temp.size()/2),
+                               f_3(temp.begin() + temp.size()/2, temp.end());
+            p_lists.erase(p_lists.begin()+i); p_lists.push_back(f_2); p_lists.push_back(f_3); //Adiciona novas listas no fim
         }
+std::cout << "Finalizou iteracao. Subs: " << p_lists.size() << "\n";
     }
+
+    std::cout << "Divisão completa. B: " << p_lists.size() << "\n";
 
     std::vector<Pixel> palette;
-    palette.reserve(maxColors);
+    palette.reserve(p_lists.size());
     //Percorre todas as listas pegando o elemento mediano ( pos(size/2) )
 
+    std::vector<Pixel> sub_lista;
+    for (unsigned int i=0; i<p_lists.size(); i++){
+        sub_lista = p_lists.at(i);
+        palette.push_back( sub_lista.at(sub_lista.size()/2) ); //adiciona a cor mediana de cada sub lista
+    }
+
+    std::cout << "Criou paleta\n";
 }

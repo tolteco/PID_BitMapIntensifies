@@ -132,3 +132,71 @@ Pixel Pixel::operator*(const Pixel& b) {
 
      return px;
 }
+
+bool Pixel::moreThan(Pixel b, char channel){
+    unsigned char a_value, b_value;
+    if (channel == 0){
+        a_value = this->get1st();
+        b_value = b.get1st();
+    } else if (channel == 1){
+        a_value = this->get2nd();
+        b_value = b.get2nd();
+    } else {
+        a_value = this->get3rd();
+        b_value = b.get3rd();
+    }
+
+    if (a_value > b_value) return true;
+    else return false;
+}
+
+bool Pixel::lessThan(Pixel b, char channel){
+    unsigned char a_value, b_value;
+    if (channel == 0){
+        a_value = this->get1st();
+        b_value = b.get1st();
+    } else if (channel == 1){
+        a_value = this->get2nd();
+        b_value = b.get2nd();
+    } else {
+        a_value = this->get3rd();
+        b_value = b.get3rd();
+    }
+
+    if (a_value < b_value) return true;
+    else return false;
+}
+
+bool Pixel::moreThan(Pixel a, Pixel b, char channel){
+    unsigned char a_value, b_value;
+    if (channel == 0){
+        a_value = a.get1st();
+        b_value = b.get1st();
+    } else if (channel == 1){
+        a_value = a.get2nd();
+        b_value = b.get2nd();
+    } else {
+        a_value = a.get3rd();
+        b_value = b.get3rd();
+    }
+
+    if (a_value > b_value) return true;
+    else return false;
+}
+
+bool Pixel::lessThan(Pixel a, Pixel b, char channel){
+    unsigned char a_value, b_value;
+    if (channel == 0){
+        a_value = a.get1st();
+        b_value = b.get1st();
+    } else if (channel == 1){
+        a_value = a.get2nd();
+        b_value = b.get2nd();
+    } else {
+        a_value = a.get3rd();
+        b_value = b.get3rd();
+    }
+
+    if (a_value < b_value) return true;
+    else return false;
+}

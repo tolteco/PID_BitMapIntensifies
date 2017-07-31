@@ -9,7 +9,7 @@
 	<iostream>
 	"pixel.h"
 
-1501345187 c:\users\jfps\documents\github\pid_bitmapintensifies\pid\pixel.h
+1501516538 c:\users\jfps\documents\github\pid_bitmapintensifies\pid\pixel.h
 	<iostream>
 
 1501269736 source:c:\users\jfps\documents\github\pid_bitmapintensifies\pid\conversion.cpp
@@ -32,7 +32,7 @@
 	"image.h"
 	"PIDMath.h"
 
-1501508491 source:c:\users\jfps\documents\github\pid_bitmapintensifies\pid\main.cpp
+1501518698 source:c:\users\jfps\documents\github\pid_bitmapintensifies\pid\main.cpp
 	<omp.h>
 	<iostream>
 	<algorithm>

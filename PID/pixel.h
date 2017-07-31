@@ -31,6 +31,11 @@ class Pixel{
         Pixel  operator*(const Pixel& b); //this - b
         //bool   operator<(const Pixel& lhs, const Pixel& rhs);
 
+        bool moreThan(Pixel b, char channel);
+        bool lessThan(Pixel b, char channel);
+        static bool moreThan(Pixel a, Pixel b, char channel);
+        static bool lessThan(Pixel a, Pixel b, char channel);
+
     friend std::ostream& operator<<(std::ostream &os, Pixel const &m);
 
     private:
