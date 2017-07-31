@@ -327,12 +327,15 @@ void MBT::changeColorSpace(MBT::ColorSpace color_space){
     Conversion c;
     //So converte se foi definido na enum "ColrSchemes"
     if (color_space == YUV){
+        std::cout<<"Entrou em toYUV\n";
         c.toYUV(pixelMap, no_lines, no_columns);
         color = MBT::ColorSpace::YUV;
     } else if (color_space == RGB){
+        std::cout<<"Entrou em toRGB\n";
         c.toRGB(pixelMap, no_lines, no_columns);
         color = MBT::ColorSpace::RGB;
     }
+    std::cout<<"Saiu de ChangeColorSpace\n";
 }
 
 int MBT::readFromFile(char* FileName){

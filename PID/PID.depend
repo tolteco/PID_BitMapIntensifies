@@ -13,7 +13,7 @@
 1501525188 c:\users\jfps\documents\github\pid_bitmapintensifies\pid\pixel.h
 	<iostream>
 
-1501531328 source:c:\users\jfps\documents\github\pid_bitmapintensifies\pid\conversion.cpp
+1501533839 source:c:\users\jfps\documents\github\pid_bitmapintensifies\pid\conversion.cpp
 	<algorithm>
 	"conversion.h"
 	"pixel.h"
@@ -23,12 +23,12 @@
 1501528961 c:\users\jfps\documents\github\pid_bitmapintensifies\pid\conversion.h
 	"pixel.h"
 
-1501531317 c:\users\jfps\documents\github\pid_bitmapintensifies\pid\pidmath.h
+1501533492 c:\users\jfps\documents\github\pid_bitmapintensifies\pid\pidmath.h
 	<vector>
 	"pixel.h"
 	"image.h"
 
-1501528576 source:c:\users\jfps\documents\github\pid_bitmapintensifies\pid\image.cpp
+1501534042 source:c:\users\jfps\documents\github\pid_bitmapintensifies\pid\image.cpp
 	<iostream>
 	<string>
 	<algorithm>
@@ -37,7 +37,7 @@
 	"image.h"
 	"PIDMath.h"
 
-1501521837 source:c:\users\jfps\documents\github\pid_bitmapintensifies\pid\main.cpp
+1501534447 source:c:\users\jfps\documents\github\pid_bitmapintensifies\pid\main.cpp
 	<omp.h>
 	<iostream>
 	<algorithm>
@@ -48,10 +48,11 @@
 	<vector>
 	<iterator>
 
-1501523092 source:c:\users\jfps\documents\github\pid_bitmapintensifies\pid\pidmath.cpp
+1501533790 source:c:\users\jfps\documents\github\pid_bitmapintensifies\pid\pidmath.cpp
 	<omp.h>
 	<math.h>
 	<iostream>
+	<algorithm>
 	"PIDMath.h"
 	"pixel.h"
 	<vector>

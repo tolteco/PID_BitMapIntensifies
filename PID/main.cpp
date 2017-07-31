@@ -93,11 +93,32 @@ void test5(){
     cout << "Fim da quantizacao.\n";
 }
 
+void test6(){
+    char* name = "Tucano.bmp";
+    BMP imag = BMP();
+    int i=imag.readFromFile(name);
+    cout << "Leu imagem: " << imag << endl;
+    Pixel t1 = imag.getPixel(0,0);
+    t1 = t1+Pixel(48,48,48);
+    cout << t1;
+    MBT newImag = MBT(imag);
+    //Pixel t2 = newImag.getPixel(0,0);
+    cout << "Transformou.\n";
+
+    newImag.changeColorSpace(MBT::ColorSpace::YUV);
+    //Pixel t3 = newImag.getPixel(0,0);
+    cout << "Converteu para YUV\n";
+
+    //cout << "t1t2: " << (t1==t2);
+    //cout << "\nt2t3: " << (t2==t3);
+    return;
+}
+
 int main() {
     if (omp_get_max_threads() > OMP_THREADS)
         omp_set_num_threads(OMP_THREADS);
 
-    test5();
+    test6();
 
     return 0;
 }

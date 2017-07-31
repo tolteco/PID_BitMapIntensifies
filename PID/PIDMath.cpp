@@ -51,7 +51,7 @@ void MatrixOperation::multiply(double mult[3][3], Pixel* mat, const unsigned int
     // Transpose B, multiply, transpose B
     unsigned int multLines = 3, multColumns = 3;
 
-    Pixel* toTranspose;
+    Pixel* toTranspose = (Pixel*)_mm_malloc(sizeof(Pixel)*multLines*columns, 64);
     std::copy(mat, mat+(multLines*columns), toTranspose);
     transposeMatrix(mat, toTranspose, multColumns, columns);
 
@@ -64,6 +64,40 @@ void MatrixOperation::multiply(double mult[3][3], Pixel* mat, const unsigned int
     transposeMatrix(mat, toTranspose, columns, multColumns);
 
 }
+
+void MatrixOperation::multiplySum(double mult[3][3], double sum[3], Pixel* mat, const unsigned int columns){
+    //A * B, sendo A e B matrizes. ColsA=LinhasB AND LinsA=LinsB, repetindo a op "ColsB" vezes
+    // Transpose B, multiply, transpose B
+    unsigned int multLines = 3, multColumns = 3;
+
+    Pixel* toTranspose = (Pixel*)_mm_malloc(sizeof(Pixel)*multLines*columns, 64);;
+    std::copy(mat, mat+(multLines*columns), toTranspose);
+    transposeMatrix(mat, toTranspose, multColumns, columns);
+
+    ///Multiplication
+
+    unsigned char Y,U,V,
+                  R,G,B;
+    Pixel temp_pixel;
+    #pragma omp parallel
+    for (unsigned int i=0; i<multLines; i++){
+        for (unsigned int j=0; j<columns; j++){ // O(n^2) intensifies
+            //temp_pixel = mat[i*columns+j]; //Normal
+            temp_pixel = mat[j*multLines+i]; //Transposta
+            R = temp_pixel.get1st(); G = temp_pixel.get2nd(); B = temp_pixel.get3rd();
+            Y = ( (  66 * R + 129 * G +  25 * B + 128) >> 8) +  16;
+            U = ( ( -38 * R -  74 * G + 112 * B + 128) >> 8) + 128;
+            V = ( ( 112 * R -  94 * G -  18 * B + 128) >> 8) + 128;
+
+            mat[j*multLines+i] = Pixel(Y, U, V);
+        }
+    }
+
+    ///End Multiplication
+
+    transposeMatrix(mat, toTranspose, columns, multColumns);
+}
+
 
 unsigned int MiscMath::roundUpToNearestMultiple(unsigned int num, unsigned int multiple){
     if (multiple == 0)
