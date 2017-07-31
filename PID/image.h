@@ -1,6 +1,8 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
+#include <vector>
+
 ///Explosion warning:
 /*  Usar os typedefs do header
 "windows.h" faz com que as estruturas
@@ -56,11 +58,6 @@ typedef struct tagBITMAPINFOHEADER {
     DWORD biClrImportant;
 }BITMAPINFOHEADER;
 #pragma pack(pop)
-
-typedef struct tagBITMAPINFO {
-    BITMAPINFOHEADER bmiHeader;
-    RGBQUAD bmiColors[1];
-}__attribute__((packed)) BITMAPINFO;
 
 #include <iostream>
 #include "pixel.h"
@@ -134,25 +131,30 @@ class PersistableIMG : public Image {
 class BMP : public PersistableIMG {
     public:
         BMP() {};
-        //BMP(const BMP &old);
-
+        BMP(const BMP &old);
         enum BiCompress_E {
             BI_RGB  = 0, //Sem compressao
             BI_RLE8 = 1, //RLE 8 bits
             BI_RLE4 = 2 //RLE 4 bits
         };
 
-        int readFromFile(char* FileName);
-        int writeToFile (char* FileName);
+        BITMAPFILEHEADER getFileHeader() const;
+        BITMAPINFOHEADER getInfoHeader() const;
+        std::vector<Pixel> getPalette() const;
+        bool isBGR() const;
+
+        int readFromFile(char* FileName) override;
+        int writeToFile (char* FileName) override;
+        void changeToBGR();
 
     friend std::ostream& operator<<(std::ostream &os, BMP const &m);
 
     private:
         BITMAPFILEHEADER file_header;
-        BITMAPINFO info;
+        //BITMAPINFO info;
         BITMAPINFOHEADER info_header;
-        Pixel palette[256];
-        bool isBGR = false;
+        std::vector<Pixel> palette;
+        bool isInBGRformat = false;
 
         void swap1stAnd3rdChannels();  //BMP armazenados em BGR
         //void reorderBMPcolumns(); //Armazena-se primeiro a ultima coluna da primeira linha
@@ -161,11 +163,24 @@ class BMP : public PersistableIMG {
 //Formato próprio - Mapa de BiTs - MBT
 class MBT : public PersistableIMG {
     public:
-        //https://stackoverflow.com/questions/8771881/setting-multiple-attributes-for-enum-structure
-        enum Reserved_FH {
+        typedef enum tagCOLORSPACE {
             YUV = 0, //Armazenado em YUV
             RGB = 1  //Armazenado em RGB
-        };
+        }ColorSpace;
+
+        MBT() {};
+        MBT(BMP old);
+
+        int readFromFile(char* FileName) override;
+        int writeToFile (char* FileName) override;
+        void changeColorSpace(ColorSpace color_space);
+        BMP constructBMP();
+
+    private:
+        BITMAPFILEHEADER file_header;
+        BITMAPINFOHEADER info_header;
+        std::vector<Pixel> palette;
+        ColorSpace color = RGB;
 
         ///Campo reservado2 do BMP pode ser usado para
         ///quando tempos num de bits diferentes entre
@@ -173,9 +188,6 @@ class MBT : public PersistableIMG {
         ///indica o tanto de bits por cor. Ex.: 5-6-5
         ///Reservado2 0101 0110 0101 0000
         ///             5    6    5        (RGB - 1st, 2nd, 3rd)
-
-    private:
-
 };
 
 

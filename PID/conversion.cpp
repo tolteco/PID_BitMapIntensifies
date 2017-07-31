@@ -1,5 +1,7 @@
+#include <algorithm>
 #include "conversion.h"
 #include "pixel.h"
+#include "PIDMath.h"
 #include "PIDMath.h"
 
 /*
@@ -14,10 +16,23 @@ http://www.fourcc.org/fccyvrgb.php
 
 */
 
-RGBColor** Conversion::toRGB(YUVColor** mapa, int lines, int columns){
+double YUV_to_RGB_matrix[3][3] = {
+    { 0.299,  0.587,  0.114},
+    {-0.147, -0.289,  0.436},
+    { 0.615, -0.515, -0.100}
+};
 
+double RGB_to_YUV_matrix[3][3] = {
+    { 1.,  0.000,  1.140},
+    { 1., -0.395, -0.581},
+    { 1.,  2.032,  0.000}
+};
+
+void Conversion::toRGB (Pixel* mapa, int lines, int columns){
+    MatrixOperation op;
+    op.multiply(YUV_to_RGB_matrix, mapa, columns);
 }
 
-YUVColor** toYUV (RGBColor** mapa, int lines, int columns){
+void Conversion::toYUV (Pixel* mapa, int lines, int columns){
 
 }

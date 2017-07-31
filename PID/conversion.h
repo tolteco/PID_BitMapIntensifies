@@ -3,14 +3,14 @@
 
 #include "pixel.h"
 
+extern double YUV_to_RGB_matrix[3][3];
+extern double RGB_to_YUV_matrix[3][3];
+
 class Conversion{
     public:
-        ~Conversion() {};
-
-        RGBColor** toRGB (YUVColor** mapa, int lines, int columns);
-        YUVColor** toYUV (RGBColor** mapa, int lines, int columns);
+        void toRGB (Pixel* mapa, int lines, int columns);
+        void toYUV (Pixel* mapa, int lines, int columns);
     private:
-
 };
 
 #endif

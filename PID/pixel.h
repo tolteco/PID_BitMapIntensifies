@@ -49,12 +49,4 @@ class Pixel{
         unsigned char third;
 };
 
-class RGBColor : public Pixel{
-
-};
-
-class YUVColor : public Pixel{
-
-};
-
 #endif

@@ -1,6 +1,7 @@
 #include <omp.h>
 #include <math.h>
 #include <iostream>
+#include <algorithm>
 //#include <xmmintrin.h>
 #include "PIDMath.h"
 #include "pixel.h"
@@ -45,9 +46,22 @@ void MatrixOperation::transposeMatrix (Pixel* src, Pixel* dst, const unsigned in
     }
 }
 
-void MatrixOperation::multiply(Pixel* mat, const unsigned int lines,     const unsigned int columns,
-            double* mult, const unsigned int multLines, const unsigned int multColumns){
+void MatrixOperation::multiply(double mult[3][3], Pixel* mat, const unsigned int columns){
+    //A * B, sendo A e B matrizes. ColsA=LinhasB AND LinsA=LinsB, repetindo a op "ColsB" vezes
+    // Transpose B, multiply, transpose B
+    unsigned int multLines = 3, multColumns = 3;
 
+    Pixel* toTranspose;
+    std::copy(mat, mat+(multLines*columns), toTranspose);
+    transposeMatrix(mat, toTranspose, multColumns, columns);
+
+    ///Multiplication
+
+    //aaaaaaaaaaaaaaa
+
+    ///End Multiplication
+
+    transposeMatrix(mat, toTranspose, columns, multColumns);
 
 }
 
@@ -64,14 +78,6 @@ unsigned int MiscMath::roundUpToNearestMultiple(unsigned int num, unsigned int m
 
 #include <vector>
 #include <algorithm>
-
-void swapCHAR(unsigned char *a, unsigned char *b){
-    unsigned char temp;
-    temp = *a;
-    *a = *b;
-    *b = temp;
-}
-
 
 //http://www.vogella.com/tutorials/JavaAlgorithmsQuicksort/article.html
 void quick_sort(std::vector<Pixel>* arr, int beg, int end, char chnl){
@@ -98,17 +104,6 @@ void quick_sort(std::vector<Pixel>* arr, int beg, int end, char chnl){
 int chnl_range(std::vector<unsigned char> arr1){
     auto minmax1 = std::minmax_element(arr1.begin(), arr1.end());
     return arr1.at(minmax1.second - arr1.begin()) - arr1.at(minmax1.first - arr1.begin());
-}
-
-char chnl_with_greatest_range(std::vector<unsigned char> arr1, std::vector<unsigned char> arr2){
-    auto minmax1 = std::minmax_element(arr1.begin(), arr1.end());
-    auto minmax2 = std::minmax_element(arr2.begin(), arr2.end());
-
-    int range1 = arr1.at(minmax1.second - arr1.begin()) - arr1.at(minmax1.first - arr1.begin());
-    int range2 = arr2.at(minmax2.second - arr2.begin()) - arr2.at(minmax2.first - arr2.begin());
-
-    if (range1 > range2) return 1;
-    else return 2;
 }
 
 char chnl_with_greatest_range(std::vector<Pixel> arr){
@@ -189,7 +184,7 @@ std::cout << "Divisão completa. B: " << p_lists.size() << "\n";
         }
     }
 
-    std::cout << "Criou paleta\n";
+    std::cout << "Mapeamento de pixels completo.\n";
 
     //Image ret = Image(img);
     return palette;

@@ -2,6 +2,7 @@
 #include <string>
 #include <algorithm>
 #include <fstream>
+#include "conversion.h"
 #include "image.h"
 #include "PIDMath.h"
 
@@ -38,55 +39,20 @@ Image::Image(const Image &old){
 }
 
 ///GETTERS
-
-Pixel Image::getPixel(unsigned int i, unsigned int j) const{
-    return Pixel(pixelMap[i*this->no_columns+j]);
-}
-
-unsigned int Image::getLines() const{
-    return no_lines;
-}
-
-unsigned int Image::getColumns() const{
-    return no_columns;
-}
-
-unsigned char Image::getBitsPerColor() const{
-    return red_bits + green_bits + blue_bits;
-}
-
-unsigned char Image::getRedBits() const{
-    return red_bits;
-}
-
-unsigned char Image::getGreenBits() const{
-    return green_bits;
-}
-
-unsigned char Image::getBlueBits() const{
-    return blue_bits;
-}
-
-unsigned int Image::getHorizontalResolution() const{
-    return pixels_meter_horizontal;
-}
-
-unsigned int Image::getVerticalResolution() const{
-    return pixels_meter_vertical;
-}
+Pixel Image::getPixel(unsigned int i, unsigned int j) const{ return Pixel(pixelMap[i*this->no_columns+j]); }
+unsigned int Image::getLines() const{ return no_lines; }
+unsigned int Image::getColumns() const{ return no_columns; }
+unsigned char Image::getBitsPerColor() const{ return red_bits + green_bits + blue_bits; }
+unsigned char Image::getRedBits() const{ return red_bits; }
+unsigned char Image::getGreenBits() const{ return green_bits; }
+unsigned char Image::getBlueBits() const{ return blue_bits; }
+unsigned int Image::getHorizontalResolution() const{ return pixels_meter_horizontal; }
+unsigned int Image::getVerticalResolution() const{ return pixels_meter_vertical; }
 
 ///SETTERS
-void Image::setPixel(Pixel p, unsigned int i, unsigned int j){
-    pixelMap[i*this->no_columns+j] = p;
-}
-
-void Image::setHorizontalResolution(unsigned int pixels_per_meter){
-    pixels_meter_horizontal = pixels_per_meter;
-}
-
-void Image::setVerticalResolution(unsigned int pixels_per_meter){
-    pixels_meter_vertical = pixels_per_meter;
-}
+void Image::setPixel(Pixel p, unsigned int i, unsigned int j){ pixelMap[i*this->no_columns+j] = p; }
+void Image::setHorizontalResolution(unsigned int pixels_per_meter){ pixels_meter_horizontal = pixels_per_meter; }
+void Image::setVerticalResolution(unsigned int pixels_per_meter){ pixels_meter_vertical = pixels_per_meter; }
 
 std::ostream &operator<<(std::ostream &os, Image const &m) {
     unsigned int cols = m.no_columns;
@@ -195,6 +161,33 @@ Image Image::operator*(const Pixel& constant) {
     return px;
 }
 
+///BMP
+
+BMP::BMP(const BMP& old){
+    no_lines = old.getLines();
+    no_columns = old.getColumns();
+    pixels_meter_horizontal = old.getHorizontalResolution();
+    pixels_meter_vertical = old.getVerticalResolution();
+    red_bits   = old.getRedBits();
+    green_bits = old.getGreenBits();
+    blue_bits  = old.getBlueBits();
+    pixelMap  = (Pixel*)_mm_malloc(sizeof(Pixel)*no_lines*no_columns, 64);
+    std::copy(old.pixelMap, old.pixelMap+(no_lines*no_columns), pixelMap);
+
+    file_header = old.getFileHeader();
+    info_header = old.getInfoHeader();
+    if (old.palette.size() > 0){
+        palette.reserve(old.getPalette().size());
+        std::copy(old.getPalette().begin(), old.getPalette().end(), palette.begin());
+        isInBGRformat = old.isBGR();
+    }
+}
+
+BITMAPFILEHEADER BMP::getFileHeader() const{ return file_header; }
+BITMAPINFOHEADER BMP::getInfoHeader() const{ return info_header; }
+std::vector<Pixel> BMP::getPalette() const{  return palette; }
+bool BMP::isBGR() const{ return isInBGRformat; }
+
 int BMP::readFromFile(char* FileName){
     std::ifstream InputStream(FileName, std::ios::in | std::ios::binary);
     if(!InputStream) return 0;
@@ -259,6 +252,11 @@ int BMP::readFromFile(char* FileName){
 }
 
 int BMP::writeToFile(char* FileName){
+    if (!isBGR()){
+        swap1stAnd3rdChannels();
+    }
+    //Write to file
+
     return -1;
 }
 
@@ -285,9 +283,63 @@ void BMP::swap1stAnd3rdChannels(){
         }
     }
 
-    isBGR = ( isBGR ? false : true); //swap bool value
+    isInBGRformat = ( isInBGRformat ? false : true); //swap bool value
 }
 
 std::ostream &operator<<(std::ostream &os, BMP const &m) {
     return os << m.info_header.biWidth << "x" << m.info_header.biHeight;
 }
+
+void BMP::changeToBGR(){
+    if (isBGR()) return;
+    swap1stAnd3rdChannels();
+}
+
+///MBT
+
+MBT::MBT(BMP old){
+    if (old.isBGR()){
+        old.changeToBGR();
+    }
+
+    file_header = old.getFileHeader();
+    info_header = old.getInfoHeader();
+
+    std::vector<Pixel> temPalette = old.getPalette();
+    if (temPalette.size() > 0){
+        palette.reserve(temPalette.size());
+        std::copy(temPalette.begin(), temPalette.end(), palette.begin());
+    }
+    color = MBT::ColorSpace::RGB;
+}
+
+BMP MBT::constructBMP(){
+    if (color == MBT::ColorSpace::YUV){
+        MBT::changeColorSpace(MBT::ColorSpace::RGB);
+    }
+
+    ///STUFF
+}
+
+void MBT::changeColorSpace(MBT::ColorSpace color_space){
+    if (color_space == color) return; //Nao precisa converter para o mesmo
+
+    Conversion c;
+    //So converte se foi definido na enum "ColrSchemes"
+    if (color_space == YUV){
+        c.toYUV(pixelMap, no_lines, no_columns);
+        color = MBT::ColorSpace::YUV;
+    } else if (color_space == RGB){
+        c.toRGB(pixelMap, no_lines, no_columns);
+        color = MBT::ColorSpace::RGB;
+    }
+}
+
+int MBT::readFromFile(char* FileName){
+    return -1;
+}
+
+int MBT::writeToFile(char* FileName){
+    return -1;
+}
+

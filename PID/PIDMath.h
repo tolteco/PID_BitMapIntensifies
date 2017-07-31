@@ -13,8 +13,7 @@ class MatrixOperation{
         ~MatrixOperation() {};
 
         void transposeMatrix (Pixel* src, Pixel* dst, const unsigned int lines, const unsigned int columns);
-        void multiply(Pixel* mat, const unsigned int lines,     const unsigned int columns,
-                    double* mult, const unsigned int multLines, const unsigned int multColumns);
+        void multiply(double mult[3][3], Pixel* mat, const unsigned int columns);
     private:
 
 };
