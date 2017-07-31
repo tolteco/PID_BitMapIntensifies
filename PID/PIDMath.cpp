@@ -127,15 +127,15 @@ char chnl_with_greatest_range(std::vector<Pixel> arr){
     else return 2;
 }
 
-Image Quantization::medianCut2ndAnd3rdChannels(Image img, unsigned short maxColors){
-    unsigned int lines = img.getLines();
-    unsigned int cols = img.getColumns();
+std::vector<Pixel> Quantization::medianCut2ndAnd3rdChannels(Image* img, unsigned short maxColors){
+    unsigned int lines = img->getLines();
+    unsigned int cols = img->getColumns();
 
     std::vector<Pixel> pixels;
     pixels.reserve(lines*cols);
     for(unsigned int i=0; i<lines; i++){
         for (unsigned int j=0; j<cols; j++){
-            pixels.push_back(img.getPixel(i,j));
+            pixels.push_back(img->getPixel(i,j));
         }
     }
 std::cout << "Pixels postos no primeiro vector\n";
@@ -160,7 +160,7 @@ std::cout << "Size: " << lists_size << "\n";
 std::cout << "Finalizou iteracao. Subs: " << p_lists.size() << "\n";
     }
 
-    std::cout << "Divisão completa. B: " << p_lists.size() << "\n";
+std::cout << "Divisão completa. B: " << p_lists.size() << "\n";
 
     std::vector<Pixel> palette;
     palette.reserve(p_lists.size());
@@ -172,5 +172,25 @@ std::cout << "Finalizou iteracao. Subs: " << p_lists.size() << "\n";
         palette.push_back( sub_lista.at(sub_lista.size()/2) ); //adiciona a cor mediana de cada sub lista
     }
 
+    #pragma omp parallel for
+    for(unsigned int i=0; i<lines; i++){
+        for (unsigned int j=0; j<cols; j++){
+            Pixel p = img->getPixel(i,j);
+            //std::cout << "Pixel save. " << p << "\n";
+            for (unsigned int k=0; k<p_lists.size(); k++){
+                sub_lista = p_lists.at(k);
+                //std::cout<< k << "\n";
+                if(std::find(sub_lista.begin(), sub_lista.end(), p) != sub_lista.end()){
+                    img->setPixel(palette.at(k), i, j);
+                    //std::cout << "Encontrado na lista: " << k << "Mapeado para: " << palette.at(k) << "\n";
+                    k=p_lists.size(); //Break this if and inner for
+                }
+            }
+        }
+    }
+
     std::cout << "Criou paleta\n";
+
+    //Image ret = Image(img);
+    return palette;
 }

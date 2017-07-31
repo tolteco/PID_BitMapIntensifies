@@ -77,25 +77,28 @@ class Image{
              unsigned char blue_bits,
              Pixel* map_of_pixels);
 
+        Image(const Image &old);
+
         //Image(const Image &old); //If define this, follow RULE OF THREE
         //https://stackoverflow.com/questions/4172722/what-is-the-rule-of-three
 
-        //virtual ~Image() = 0;
+        ~Image();
 
         ///GETTERS
         Pixel getPixel(unsigned int i, unsigned int j) const;
-        unsigned int getLines();
-        unsigned int getColumns();
-        unsigned char getBitsPerColor();
-        unsigned char getRedBits();
-        unsigned char getGreenBits();
-        unsigned char getBlueBits();
-        unsigned int getHorizontalResolution();
-        unsigned int getVerticalResolution();
+        unsigned int getLines() const;
+        unsigned int getColumns() const;
+        unsigned char getBitsPerColor() const;
+        unsigned char getRedBits() const;
+        unsigned char getGreenBits() const;
+        unsigned char getBlueBits() const;
+        unsigned int getHorizontalResolution() const;
+        unsigned int getVerticalResolution() const;
 
         ///SETTERS
         void setHorizontalResolution(unsigned int);
         void setVerticalResolution(unsigned int);
+        void setPixel(Pixel p, unsigned int i, unsigned int j);
 
         /// Operators
         Image operator+(const Image& b); //this + b
@@ -131,6 +134,8 @@ class PersistableIMG : public Image {
 class BMP : public PersistableIMG {
     public:
         BMP() {};
+        //BMP(const BMP &old);
+
         enum BiCompress_E {
             BI_RGB  = 0, //Sem compressao
             BI_RLE8 = 1, //RLE 8 bits

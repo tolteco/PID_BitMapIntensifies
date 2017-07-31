@@ -6,7 +6,9 @@
 #include "PIDMath.h"
 
 //destructor
-//Image::~Image() {}
+Image::~Image() {
+    _mm_free(pixelMap);
+}
 
 Image::Image(unsigned int lines, unsigned int columns,
      unsigned char red_bits,
@@ -21,45 +23,63 @@ Image::Image(unsigned int lines, unsigned int columns,
     std::copy(map_of_pixels, map_of_pixels+(lines*columns), pixelMap);
 }
 
+Image::Image(const Image &old){
+    no_lines = old.getLines();
+    no_columns = old.getColumns();
+    pixels_meter_horizontal = old.getHorizontalResolution();
+    pixels_meter_vertical = old.getVerticalResolution();
+
+    red_bits   = old.getRedBits();
+    green_bits = old.getGreenBits();
+    blue_bits  = old.getBlueBits();
+
+    pixelMap  = (Pixel*)_mm_malloc(sizeof(Pixel)*no_lines*no_columns, 64);
+    std::copy(old.pixelMap, old.pixelMap+(no_lines*no_columns), pixelMap);
+}
+
 ///GETTERS
 
 Pixel Image::getPixel(unsigned int i, unsigned int j) const{
     return Pixel(pixelMap[i*this->no_columns+j]);
 }
 
-unsigned int Image::getLines(){
+unsigned int Image::getLines() const{
     return no_lines;
 }
 
-unsigned int Image::getColumns(){
+unsigned int Image::getColumns() const{
     return no_columns;
 }
 
-unsigned char Image::getBitsPerColor(){
+unsigned char Image::getBitsPerColor() const{
     return red_bits + green_bits + blue_bits;
 }
 
-unsigned char Image::getRedBits(){
+unsigned char Image::getRedBits() const{
     return red_bits;
 }
 
-unsigned char Image::getGreenBits(){
+unsigned char Image::getGreenBits() const{
     return green_bits;
 }
 
-unsigned char Image::getBlueBits(){
+unsigned char Image::getBlueBits() const{
     return blue_bits;
 }
 
-unsigned int Image::getHorizontalResolution(){
+unsigned int Image::getHorizontalResolution() const{
     return pixels_meter_horizontal;
 }
 
-unsigned int Image::getVerticalResolution(){
+unsigned int Image::getVerticalResolution() const{
     return pixels_meter_vertical;
 }
 
 ///SETTERS
+void Image::setPixel(Pixel p, unsigned int i, unsigned int j){
+    pixelMap[i*this->no_columns+j] = p;
+}
+
 void Image::setHorizontalResolution(unsigned int pixels_per_meter){
     pixels_meter_horizontal = pixels_per_meter;
 }
@@ -174,56 +194,6 @@ Image Image::operator*(const Pixel& constant) {
 
     return px;
 }
-
-//Notas de aula de PID :D
-/*int BMP::readFromFile(char* FileName){
-    std::ifstream InputStream(FileName, std::ios::in | std::ios::binary);
-    if(!InputStream) return 0;
-
-    // Lê o header do arquivo imagem
-    InputStream.read((unsigned char*)&BMPHdr, sizeof(BITMAPFILEHEADER));
-
-    // Verifica se formato da imagem é aceitável (deve ser ‘BM’)
-    if(BMPHdr.bfType != (('M' << 8) | 'B')) return -1;
-
-    // Determina o tamanho do DIB para leitura através do campo bfSize
-    // menos o tamanho do BITMAPFILEHEADER
-    long bmpsize = BMPHdr.bfSize - sizeof(BITMAPFILEHEADER);
-
-    // Aloca espaço para o bitmap
-    PointerToDIB = GlobalAllocPtr(GHND, bmpsize);
-
-    // Se a memória falha retorna NULL
-    if(PointerToDIB == 0) return -1;
-
-    // Aloca espaço para a imagem
-    unsigned char *rbuf = new unsigned char[MaxBlock];
-    if(rbuf == NULL) return -1;
-
-    unsigned char huge
-    *DIBData = (unsigned char huge*) PointerToDIB;
-    unsigned int chunksize;
-    unsigned int i;
-    // Faz leitura por pedaços até acabar o arquivo
-    while(bmpsize > 0) {
-        if(bmpsize > MaxBlock)
-            chunksize = MaxBlock;
-        else
-            chunksize = (WORD)bmpsize;
-            InputStream.read(rbuf, chunksize);
-        // Copia para o DIB
-        for(i = 0; i < chunksize; i++)
-            DIBData[i] = rbuf[i];
-        bmpsize -= chunksize;
-        DIBData += chunksize;
-    }
-    delete rbuf;
-    // Computa o número de bytes por linha, arredondando para múltiplo de 4
-    LPBITMAPINFOHEADER pBMPInfo = (LPBITMAPINFOHEADER)PointerToDIB;
-    BytePerLine = ((long)pBMPInfo->biWidth * (long)pBMPInfo->biBitCount +
-                    31L) / 32 * 4;
-    return TRUE;
-}*/
 
 int BMP::readFromFile(char* FileName){
     std::ifstream InputStream(FileName, std::ios::in | std::ios::binary);

@@ -133,6 +133,15 @@ Pixel Pixel::operator*(const Pixel& b) {
      return px;
 }
 
+bool Pixel::operator==(const Pixel& b){
+    if(
+        this->first  == b.first &&
+        this->second == b.second &&
+        this->third  == b.third
+      )    { return true; }
+      else { return false;}
+}
+
 bool Pixel::moreThan(Pixel b, char channel){
     unsigned char a_value, b_value;
     if (channel == 0){

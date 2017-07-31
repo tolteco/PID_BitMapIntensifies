@@ -29,6 +29,11 @@ class Pixel{
         Pixel  operator+(const Pixel& b); //this + b
         Pixel  operator-(const Pixel& b); //this - b
         Pixel  operator*(const Pixel& b); //this - b
+        bool  operator==(const Pixel& b); //this == b
+
+        //NAO deve ser feito sobrecarda dos operadores "<", ">", etc;
+        //por meio de operadores, nao se sabe que canal comparar.
+        //Use as funções "moreThan", "lessThan", ou similar para tal
         //bool   operator<(const Pixel& lhs, const Pixel& rhs);
 
         bool moreThan(Pixel b, char channel);

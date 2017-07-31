@@ -78,12 +78,26 @@ void test4(vector<int>*arr1){
     iter_swap(arr1->begin() + 0, arr1->begin() + 3);
 }
 
+void test5(){
+    char* name = "Tucano.bmp";
+    BMP imag = BMP();
+    int i=imag.readFromFile(name);
+    cout << "Leu imagem: " << imag << endl;
+
+    cout << "Chamando quantizacao...\n";
+
+    vector<Pixel> palette;
+    Quantization q;
+    palette = q.medianCut2ndAnd3rdChannels(&imag, 256);
+
+    cout << "Fim da quantizacao.\n";
+}
+
 int main() {
     if (omp_get_max_threads() > OMP_THREADS)
         omp_set_num_threads(OMP_THREADS);
 
-    vector<int>arr1{1,2,3,-1,-2,-3};
-    vector<int>arr2{1,2,3,-1,-2,-4};
+    test5();
 
     return 0;
 }
