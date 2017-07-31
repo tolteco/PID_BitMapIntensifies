@@ -91,6 +91,7 @@ class Image{
         unsigned char getBlueBits() const;
         unsigned int getHorizontalResolution() const;
         unsigned int getVerticalResolution() const;
+        Pixel* getMap() const; ///I know. Ugly access and stuff.
 
         ///SETTERS
         void setHorizontalResolution(unsigned int);

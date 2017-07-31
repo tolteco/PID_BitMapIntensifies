@@ -39,15 +39,16 @@ Image::Image(const Image &old){
 }
 
 ///GETTERS
-Pixel Image::getPixel(unsigned int i, unsigned int j) const{ return Pixel(pixelMap[i*this->no_columns+j]); }
-unsigned int Image::getLines() const{ return no_lines; }
-unsigned int Image::getColumns() const{ return no_columns; }
+Pixel         Image::getPixel(unsigned int i, unsigned int j) const{ return Pixel(pixelMap[i*this->no_columns+j]); }
+unsigned int  Image::getLines() const{ return no_lines; }
+unsigned int  Image::getColumns() const{ return no_columns; }
 unsigned char Image::getBitsPerColor() const{ return red_bits + green_bits + blue_bits; }
 unsigned char Image::getRedBits() const{ return red_bits; }
 unsigned char Image::getGreenBits() const{ return green_bits; }
 unsigned char Image::getBlueBits() const{ return blue_bits; }
-unsigned int Image::getHorizontalResolution() const{ return pixels_meter_horizontal; }
-unsigned int Image::getVerticalResolution() const{ return pixels_meter_vertical; }
+unsigned int  Image::getHorizontalResolution() const{ return pixels_meter_horizontal; }
+unsigned int  Image::getVerticalResolution() const{ return pixels_meter_vertical; }
+Pixel*        Image::getMap() const{ return pixelMap; }
 
 ///SETTERS
 void Image::setPixel(Pixel p, unsigned int i, unsigned int j){ pixelMap[i*this->no_columns+j] = p; }
@@ -302,13 +303,21 @@ MBT::MBT(BMP old){
         old.changeToBGR();
     }
 
+    no_lines = old.getLines();
+    no_columns = old.getColumns();
+    pixels_meter_horizontal = old.getHorizontalResolution();
+    pixels_meter_vertical = old.getVerticalResolution();
+    red_bits   = old.getRedBits();
+    green_bits = old.getGreenBits();
+    blue_bits  = old.getBlueBits();
+    pixelMap  = (Pixel*)_mm_malloc(sizeof(Pixel)*no_lines*no_columns, 64);
+    std::copy(old.getMap(), old.getMap()+(no_lines*no_columns), pixelMap);
+
     file_header = old.getFileHeader();
     info_header = old.getInfoHeader();
-
-    std::vector<Pixel> temPalette = old.getPalette();
-    if (temPalette.size() > 0){
-        palette.reserve(temPalette.size());
-        std::copy(temPalette.begin(), temPalette.end(), palette.begin());
+    if (old.getPalette().size() > 0){
+        palette.reserve(old.getPalette().size());
+        std::copy(old.getPalette().begin(), old.getPalette().end(), palette.begin());
     }
     color = MBT::ColorSpace::RGB;
 }

@@ -102,15 +102,17 @@ void test6(){
     t1 = t1+Pixel(48,48,48);
     cout << t1;
     MBT newImag = MBT(imag);
-    //Pixel t2 = newImag.getPixel(0,0);
-    cout << "Transformou.\n";
+    Pixel t2 = newImag.getPixel(0,0);
+    cout << "\nTransformou.\n";
 
     newImag.changeColorSpace(MBT::ColorSpace::YUV);
-    //Pixel t3 = newImag.getPixel(0,0);
+    Pixel t3 = newImag.getPixel(0,0);
     cout << "Converteu para YUV\n";
 
-    //cout << "t1t2: " << (t1==t2);
-    //cout << "\nt2t3: " << (t2==t3);
+    Quantization q;
+    vector<Pixel> palette = q.medianCut2ndAnd3rdChannels(&newImag, 256);
+
+    cout << "Quantizou\n";
     return;
 }
 
