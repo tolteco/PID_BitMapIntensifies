@@ -2,35 +2,99 @@
 <CodeBlocks_layout_file>
 	<FileVersion major="1" minor="0" />
 	<ActiveTarget name="Debug" />
-	<File name="image.cpp" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="pixel.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="9717" topLine="196" />
+			<Cursor1 position="1675" topLine="14" />
+		</Cursor>
+	</File>
+	<File name="conversion.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2124" topLine="29" />
 		</Cursor>
 		<Folding>
-			<Collapse line="17" />
-			<Collapse line="25" />
+			<Collapse line="20" />
+			<Collapse line="26" />
+		</Folding>
+	</File>
+	<File name="PIDMath.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="675" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="bitmap.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="19" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="image.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3699" topLine="40" />
+		</Cursor>
+		<Folding>
+			<Collapse line="19" />
 			<Collapse line="29" />
-			<Collapse line="33" />
-			<Collapse line="37" />
-			<Collapse line="41" />
-			<Collapse line="45" />
+			<Collapse line="38" />
+			<Collapse line="46" />
+			<Collapse line="67" />
+			<Collapse line="167" />
+		</Folding>
+	</File>
+	<File name="conversion.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="180" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="main.cpp" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2662" topLine="27" />
+		</Cursor>
+		<Folding>
+			<Collapse line="11" />
+			<Collapse line="20" />
+			<Collapse line="30" />
 			<Collapse line="49" />
-			<Collapse line="53" />
+			<Collapse line="59" />
+			<Collapse line="76" />
+			<Collapse line="80" />
+		</Folding>
+	</File>
+	<File name="image.cpp" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="11253" topLine="62" />
+		</Cursor>
+		<Folding>
+			<Collapse line="9" />
+			<Collapse line="20" />
+			<Collapse line="26" />
 			<Collapse line="57" />
-			<Collapse line="62" />
-			<Collapse line="66" />
-			<Collapse line="70" />
-			<Collapse line="85" />
-			<Collapse line="113" />
-			<Collapse line="127" />
-			<Collapse line="141" />
-			<Collapse line="153" />
-			<Collapse line="165" />
+			<Collapse line="72" />
+			<Collapse line="100" />
+			<Collapse line="105" />
+			<Collapse line="114" />
+			<Collapse line="128" />
+			<Collapse line="140" />
+			<Collapse line="152" />
+			<Collapse line="167" />
+			<Collapse line="191" />
+			<Collapse line="216" />
+			<Collapse line="248" />
+			<Collapse line="280" />
+			<Collapse line="289" />
+			<Collapse line="338" />
+			<Collapse line="345" />
+			<Collapse line="364" />
+			<Collapse line="368" />
+			<Collapse line="373" />
+			<Collapse line="394" />
+			<Collapse line="418" />
+			<Collapse line="426" />
+			<Collapse line="443" />
+			<Collapse line="447" />
 		</Folding>
 	</File>
 	<File name="pixel.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="2861" topLine="11" />
+			<Cursor1 position="1625" topLine="117" />
 		</Cursor>
 		<Folding>
 			<Collapse line="13" />
@@ -44,53 +108,33 @@
 			<Collapse line="53" />
 			<Collapse line="61" />
 			<Collapse line="68" />
-			<Collapse line="76" />
-			<Collapse line="83" />
-			<Collapse line="101" />
-			<Collapse line="118" />
 		</Folding>
 	</File>
-	<File name="PIDMath.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="PIDMath.cpp" open="1" top="1" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1775" topLine="23" />
+			<Cursor1 position="5741" topLine="23" />
 		</Cursor>
+		<Folding>
+			<Collapse line="10" />
+			<Collapse line="13" />
+			<Collapse line="19" />
+			<Collapse line="23" />
+			<Collapse line="29" />
+			<Collapse line="31" />
+			<Collapse line="38" />
+			<Collapse line="44" />
+			<Collapse line="49" />
+			<Collapse line="68" />
+			<Collapse line="102" />
+			<Collapse line="109" />
+			<Collapse line="125" />
+			<Collapse line="146" />
+			<Collapse line="151" />
+		</Folding>
 	</File>
 	<File name="bitmap.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="139" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="pixel.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="906" topLine="11" />
-		</Cursor>
-	</File>
-	<File name="PIDMath.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="643" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="bitmap.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="19" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="image.h" open="1" top="1" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3433" topLine="20" />
-		</Cursor>
-		<Folding>
-			<Collapse line="16" />
-			<Collapse line="24" />
-			<Collapse line="31" />
-			<Collapse line="45" />
-			<Collapse line="56" />
-			<Collapse line="110" />
-		</Folding>
-	</File>
-	<File name="main.cpp" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1046" topLine="9" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>
