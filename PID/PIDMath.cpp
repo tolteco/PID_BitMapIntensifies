@@ -6,6 +6,7 @@
 #include "PIDMath.h"
 #include "pixel.h"
 
+///MATRIX OP
 //https://stackoverflow.com/questions/16737298/what-is-the-fastest-way-to-transpose-a-matrix-in-c
 inline void transpose_scalar_block(Pixel *A, Pixel *B, const int lda, const int ldb, const int block_size) {
     #pragma omp parallel for
@@ -98,7 +99,7 @@ void MatrixOperation::multiplySum(double mult[3][3], double sum[3], Pixel* mat, 
     transposeMatrix(mat, toTranspose, columns, multColumns);
 }
 
-
+///MISC MATH
 unsigned char MiscMath::lookUpPalette(std::vector<Pixel> palette, Pixel color){
     for(unsigned char i=0; i<palette.size(); i++){
         if(palette.at(i) == color) return i;
@@ -117,6 +118,7 @@ unsigned int MiscMath::roundUpToNearestMultiple(unsigned int num, unsigned int m
     return num + multiple - remainder;
 }
 
+///QUANTIZATION
 #include <vector>
 #include <algorithm>
 
@@ -175,7 +177,7 @@ std::vector<Pixel> Quantization::medianCut2ndAnd3rdChannels(Image* img, unsigned
         }
     }
 std::cout << "Pixels postos no primeiro vector\n";
-    ///http://blog.isamert.net/median-cut-algorithm-in-qt-c/
+
     //http://www.cplusplus.com/forum/general/833/
     std::vector<std::vector<Pixel>> p_lists;
     p_lists.push_back(pixels);

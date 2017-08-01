@@ -100,8 +100,9 @@ void test6(){
     cout << "Leu imagem: " << imag << endl;
     Pixel t1 = imag.getPixel(0,0);
     t1 = t1+Pixel(48,48,48);
-    cout << t1;
+    cout << "Pixel before: " << t1;
     MBT newImag = MBT(imag);
+    cout << "MBT: " << newImag.getLines() << endl;
     Pixel t2 = newImag.getPixel(0,0);
     cout << "\nTransformou.\n";
 
@@ -110,12 +111,21 @@ void test6(){
     cout << "Converteu para YUV\n";
 
     Quantization q;
-    vector<Pixel> palette = q.medianCut2ndAnd3rdChannels(&newImag, 256);
+    vector<Pixel> palette = q.medianCut2ndAnd3rdChannels(&imag, 256);
     newImag.setPalette(palette);
-    //imag = newImag.constructBMP();
-    cout << "Quantizou\n";
+    imag = newImag.constructBMP();
 
-    cout << "Paleta size: " << newImag.getPalette().size();
+    cout << "Quantizou.\nPaleta size: " << imag.getPalette().size() << endl;
+    //imag.getPixel(0,0);
+
+    cout << imag;
+    //t1 = imag.getPixel(0,0)+Pixel(48,48,48);
+    //cout << "Pixel after: " << t1;
+
+    cout << "\nBefore write...\n";
+
+    imag.writeToFile("out.bmp");
+
     return;
 }
 

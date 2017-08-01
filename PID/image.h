@@ -127,13 +127,13 @@ class PersistableIMG : public Image {
         virtual int writeToFile (char* FileName) = 0;
         virtual int readFromFile(char* FileName) = 0;
 };
-
+class MBT;
 //REF. NOTAS DE AULA DE PID :D
 class BMP : public PersistableIMG {
     public:
         BMP() {};
         BMP(const BMP &old);
-        BMP(BITMAPFILEHEADER fil, BITMAPINFOHEADER inf, std::vector<Pixel> palette, Image i);
+        BMP(BITMAPFILEHEADER fil, BITMAPINFOHEADER inf, std::vector<Pixel> palette, MBT* i);
         enum BiCompress_E {
             BI_RGB  = 0, //Sem compressao
             BI_RLE8 = 1, //RLE 8 bits

@@ -164,27 +164,28 @@ Image Image::operator*(const Pixel& constant) {
 
 ///BMP
 
-BMP::BMP(BITMAPFILEHEADER fil, BITMAPINFOHEADER inf, std::vector<Pixel> palette, Image i)
+BMP::BMP(BITMAPFILEHEADER fil, BITMAPINFOHEADER inf, std::vector<Pixel> palette, MBT* i)
    : file_header(fil), info_header(inf), palette(palette) {
-    no_lines = i.getLines();
-    no_columns = i.getColumns();
-    pixels_meter_horizontal = i.getHorizontalResolution();
-    pixels_meter_vertical = i.getVerticalResolution();
-    red_bits   = i.getRedBits();
-    green_bits = i.getGreenBits();
-    blue_bits  = i.getBlueBits();
+    no_lines = i->getLines();
+    no_columns = i->getColumns();
+    pixels_meter_horizontal = i->getHorizontalResolution();
+    pixels_meter_vertical = i->getVerticalResolution();
+    red_bits   = i->getRedBits();
+    green_bits = i->getGreenBits();
+    blue_bits  = i->getBlueBits();
     pixelMap  = (Pixel*)_mm_malloc(sizeof(Pixel)*no_lines*no_columns, 64);
-    std::copy(i.getMap(), i.getMap()+(no_lines*no_columns), pixelMap);
+    std::copy(i->getMap(), i->getMap()+(no_lines*no_columns), pixelMap);
 
     file_header.Reserved2 = 0;
     file_header.Reserved = 0;
 
     if(palette.size() > 0){
         file_header.OffsetBits = 54 + (palette.size()*4);
-        info_header.biSize = BMP::BMP_file_size(palette.size(), i.getLines(), i.getColumns(), 8);
+        info_header.biSize = BMP::BMP_file_size(palette.size(), no_lines, no_columns, 8);
+        info_header.biBitCount = 8;
     } else {
         file_header.OffsetBits = 54;
-        info_header.biSize = BMP::BMP_file_size(palette.size(), i.getLines(), i.getColumns(), 24);
+        info_header.biSize = BMP::BMP_file_size(palette.size(), no_lines, no_columns, 24);
     }
 }
 
@@ -273,16 +274,66 @@ int BMP::readFromFile(char* FileName){
             palette[i] = Pixel(palette_rs[i].rgbRed, palette_rs[i].rgbGreen, palette_rs[i].rgbBlue);*/
 
     //fromBGRtoRGB();
+    InputStream.close();
     return 0;
 }
 
-int BMP::writeToFile(char* FileName){
-    if (!isBGR()){
-        swap1stAnd3rdChannels();
-    }
-    //Write to file
+RGBQUAD quadBuilder(Pixel p){
+    RGBQUAD quad;
+    quad.rgbRed = p.get1st();
+    quad.rgbGreen = p.get2nd();
+    quad.rgbBlue = p.get3rd();
+    quad.rgbReserved = 0;
+    return quad;
+}
 
-    return -1;
+int BMP::writeToFile(char* FileName){
+    std::cout<<"Escrita\n";
+    if (isBGR()){ swap1stAnd3rdChannels(); }
+    //Write to file
+    std::ofstream Output(FileName,std::ofstream::binary); //Não verifica se ha arquivo já existente
+std::cout<<"Outstream\n";
+    Output.write(reinterpret_cast<char *>(&file_header), sizeof(BITMAPFILEHEADER));
+    Output.write(reinterpret_cast<char *>(&info_header), sizeof(BITMAPINFOHEADER));
+std::cout<<"Write header\n";
+    unsigned char color_coding[no_lines][no_columns];
+    Output.flush();
+    MiscMath m;
+    for (int i=0; i<no_lines; i++){
+        for (int j=0; j<no_columns; j++){
+            color_coding[i][j] = m.lookUpPalette(palette, this->getPixel(i,j));
+        }
+    }
+
+    RGBQUAD palette_rs[palette.size()];
+    for (int i=0; i<palette.size(); i++){
+        palette_rs [i] = quadBuilder(palette.at(i));
+    }
+    Output.write(reinterpret_cast<char *>(&palette_rs), sizeof(palette_rs));
+std::cout<<"Write palette.\n";
+Output.flush();
+    MiscMath mscm; ///Generalizar
+    unsigned int linePixels = info_header.biWidth;
+    unsigned int lineBytes = mscm.roundUpToNearestMultiple(linePixels, 4);
+
+    unsigned char lineBuffer[linePixels];
+    unsigned int no_spare_bytes = lineBytes - (linePixels);
+    char spareBytes[no_spare_bytes];
+
+    unsigned int i,j;
+    unsigned int cols = info_header.biWidth;
+    for(i=0; i<info_header.biHeight; i++){
+        for(j=0; j<linePixels; j++){
+            lineBuffer[j] = color_coding[i][j];
+        }
+        Output.write((char*)&lineBuffer, sizeof(lineBuffer));
+        if (no_spare_bytes != 0){
+           Output.write((char*)&spareBytes, sizeof(spareBytes));
+        }
+    }
+    Output.close();
+
+    return 0;
 }
 
 void swapUCHAR(unsigned char *a, unsigned char *b){
@@ -370,7 +421,7 @@ BMP MBT::constructBMP(){
         MBT::changeColorSpace(MBT::ColorSpace::RGB);
     }
 
-    ///STUFF
+    return BMP(this->file_header, this->info_header, this->palette, this);
 }
 
 void MBT::changeColorSpace(MBT::ColorSpace color_space){
