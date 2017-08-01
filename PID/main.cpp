@@ -111,8 +111,11 @@ void test6(){
 
     Quantization q;
     vector<Pixel> palette = q.medianCut2ndAnd3rdChannels(&newImag, 256);
-
+    newImag.setPalette(palette);
+    //imag = newImag.constructBMP();
     cout << "Quantizou\n";
+
+    cout << "Paleta size: " << newImag.getPalette().size();
     return;
 }
 

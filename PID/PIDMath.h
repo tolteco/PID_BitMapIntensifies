@@ -22,6 +22,7 @@ class MatrixOperation{
 class MiscMath{
 public:
     unsigned int roundUpToNearestMultiple(unsigned int num, unsigned int multiple);
+    unsigned char lookUpPalette(std::vector<Pixel> palette, Pixel color);
 };
 
 class Quantization{

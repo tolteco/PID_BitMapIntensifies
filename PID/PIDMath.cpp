@@ -99,6 +99,13 @@ void MatrixOperation::multiplySum(double mult[3][3], double sum[3], Pixel* mat, 
 }
 
 
+unsigned char MiscMath::lookUpPalette(std::vector<Pixel> palette, Pixel color){
+    for(unsigned char i=0; i<palette.size(); i++){
+        if(palette.at(i) == color) return i;
+    }
+    return 0;
+}
+
 unsigned int MiscMath::roundUpToNearestMultiple(unsigned int num, unsigned int multiple){
     if (multiple == 0)
         return num;
@@ -220,6 +227,7 @@ std::cout << "Divisão completa. B: " << p_lists.size() << "\n";
 
     std::cout << "Mapeamento de pixels completo.\n";
 
+    //img->setBitsPerColor(8);
     //Image ret = Image(img);
     return palette;
 }

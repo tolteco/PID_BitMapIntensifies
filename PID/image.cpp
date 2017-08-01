@@ -164,6 +164,30 @@ Image Image::operator*(const Pixel& constant) {
 
 ///BMP
 
+BMP::BMP(BITMAPFILEHEADER fil, BITMAPINFOHEADER inf, std::vector<Pixel> palette, Image i)
+   : file_header(fil), info_header(inf), palette(palette) {
+    no_lines = i.getLines();
+    no_columns = i.getColumns();
+    pixels_meter_horizontal = i.getHorizontalResolution();
+    pixels_meter_vertical = i.getVerticalResolution();
+    red_bits   = i.getRedBits();
+    green_bits = i.getGreenBits();
+    blue_bits  = i.getBlueBits();
+    pixelMap  = (Pixel*)_mm_malloc(sizeof(Pixel)*no_lines*no_columns, 64);
+    std::copy(i.getMap(), i.getMap()+(no_lines*no_columns), pixelMap);
+
+    file_header.Reserved2 = 0;
+    file_header.Reserved = 0;
+
+    if(palette.size() > 0){
+        file_header.OffsetBits = 54 + (palette.size()*4);
+        info_header.biSize = BMP::BMP_file_size(palette.size(), i.getLines(), i.getColumns(), 8);
+    } else {
+        file_header.OffsetBits = 54;
+        info_header.biSize = BMP::BMP_file_size(palette.size(), i.getLines(), i.getColumns(), 24);
+    }
+}
+
 BMP::BMP(const BMP& old){
     no_lines = old.getLines();
     no_columns = old.getColumns();
@@ -296,6 +320,25 @@ void BMP::changeToBGR(){
     swap1stAnd3rdChannels();
 }
 
+unsigned int BMP::BMP_file_size(unsigned int paletteElements, unsigned int lines, unsigned int cols, unsigned char bitsPerColor){
+    #define FILE_AND_INFO_HEADERS_SIZE 54
+    unsigned int size_in_bytes = FILE_AND_INFO_HEADERS_SIZE;
+    if (paletteElements == 0){
+        unsigned char bytes_per_color = bitsPerColor/8; //Explosions not byte round
+        unsigned int line_bytes = cols*bytes_per_color;
+        MiscMath m;
+        unsigned int round_lines = m.roundUpToNearestMultiple(line_bytes, 4);
+        size_in_bytes += (round_lines) * lines;
+    } else {
+        size_in_bytes += (paletteElements*4); //RGB QUAD
+        unsigned int line_bytes = cols; //Cada cor 1 byte para a unica quantizacao implementada
+        MiscMath m;
+        unsigned int round_lines = m.roundUpToNearestMultiple(line_bytes, 4);
+        size_in_bytes += (round_lines) * lines;
+    }
+    return size_in_bytes;
+}
+
 ///MBT
 
 MBT::MBT(BMP old){
@@ -355,3 +398,7 @@ int MBT::writeToFile(char* FileName){
     return -1;
 }
 
+BITMAPFILEHEADER MBT::getFileHeader() const{ return file_header; }
+BITMAPINFOHEADER MBT::getInfoHeader() const{ return info_header; }
+std::vector<Pixel> MBT::getPalette() const{  return palette; }
+void MBT::setPalette(std::vector<Pixel> pal){ palette = pal;}

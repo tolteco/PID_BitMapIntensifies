@@ -133,6 +133,7 @@ class BMP : public PersistableIMG {
     public:
         BMP() {};
         BMP(const BMP &old);
+        BMP(BITMAPFILEHEADER fil, BITMAPINFOHEADER inf, std::vector<Pixel> palette, Image i);
         enum BiCompress_E {
             BI_RGB  = 0, //Sem compressao
             BI_RLE8 = 1, //RLE 8 bits
@@ -147,6 +148,8 @@ class BMP : public PersistableIMG {
         int readFromFile(char* FileName) override;
         int writeToFile (char* FileName) override;
         void changeToBGR();
+
+    static unsigned int BMP_file_size(unsigned int paletteElements, unsigned int lines, unsigned int cols, unsigned char bitsPerColor);
 
     friend std::ostream& operator<<(std::ostream &os, BMP const &m);
 
@@ -171,6 +174,11 @@ class MBT : public PersistableIMG {
 
         MBT() {};
         MBT(BMP old);
+
+        BITMAPFILEHEADER getFileHeader() const;
+        BITMAPINFOHEADER getInfoHeader() const;
+        std::vector<Pixel> getPalette() const;
+        void setPalette(std::vector<Pixel> pal);
 
         int readFromFile(char* FileName) override;
         int writeToFile (char* FileName) override;
