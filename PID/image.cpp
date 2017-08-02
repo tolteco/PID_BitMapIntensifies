@@ -8,35 +8,24 @@
 
 //destructor
 Image::~Image() {
-    _mm_free(pixelMap);
+    std::vector<Pixel>().swap(pixelMap); //https://stackoverflow.com/questions/993590/should-i-delete-vectorstring
 }
 
 Image::Image(unsigned int lines, unsigned int columns,
      unsigned char red_bits,
      unsigned char green_bits,
      unsigned char blue_bits,
-     Pixel* map_of_pixels)
+     std::vector<Pixel> map_of_pixels)
      : no_lines(lines), no_columns(columns),
        red_bits(red_bits), green_bits(green_bits),
-       blue_bits(blue_bits){
+       blue_bits(blue_bits),
+       pixelMap(map_of_pixels){ }
 
-    pixelMap  = (Pixel*)_mm_malloc(sizeof(Pixel)*lines*columns, 64);
-    std::copy(map_of_pixels, map_of_pixels+(lines*columns), pixelMap);
-}
-
-Image::Image(const Image &old){
-    no_lines = old.getLines();
-    no_columns = old.getColumns();
-    pixels_meter_horizontal = old.getHorizontalResolution();
-    pixels_meter_vertical = old.getVerticalResolution();
-
-    red_bits   = old.getRedBits();
-    green_bits = old.getGreenBits();
-    blue_bits  = old.getBlueBits();
-
-    pixelMap  = (Pixel*)_mm_malloc(sizeof(Pixel)*no_lines*no_columns, 64);
-    std::copy(old.pixelMap, old.pixelMap+(no_lines*no_columns), pixelMap);
-}
+Image::Image(const Image &old)
+     : no_lines(old.no_lines), no_columns(old.no_lines),
+       red_bits(old.red_bits), green_bits(old.green_bits),
+       blue_bits(old.blue_bits),
+       pixelMap(old.pixelMap){ }
 
 ///GETTERS
 Pixel         Image::getPixel(unsigned int i, unsigned int j) const{ return Pixel(pixelMap[i*this->no_columns+j]); }
@@ -48,7 +37,7 @@ unsigned char Image::getGreenBits() const{ return green_bits; }
 unsigned char Image::getBlueBits() const{ return blue_bits; }
 unsigned int  Image::getHorizontalResolution() const{ return pixels_meter_horizontal; }
 unsigned int  Image::getVerticalResolution() const{ return pixels_meter_vertical; }
-Pixel*        Image::getMap() const{ return pixelMap; }
+std::vector<Pixel> Image::getMap() const{ return pixelMap; }
 
 ///SETTERS
 void Image::setPixel(Pixel p, unsigned int i, unsigned int j){ pixelMap[i*this->no_columns+j] = p; }
@@ -173,8 +162,9 @@ BMP::BMP(BITMAPFILEHEADER fil, BITMAPINFOHEADER inf, std::vector<Pixel> palette,
     red_bits   = i->getRedBits();
     green_bits = i->getGreenBits();
     blue_bits  = i->getBlueBits();
-    pixelMap  = (Pixel*)_mm_malloc(sizeof(Pixel)*no_lines*no_columns, 64);
-    std::copy(i->getMap(), i->getMap()+(no_lines*no_columns), pixelMap);
+
+    pixelMap.reserve(no_lines*no_columns);
+    std::copy(i->getMap().begin(), i->getMap().end(), pixelMap);
 
     file_header.Reserved2 = 0;
     file_header.Reserved = 0;
@@ -197,8 +187,9 @@ BMP::BMP(const BMP& old){
     red_bits   = old.getRedBits();
     green_bits = old.getGreenBits();
     blue_bits  = old.getBlueBits();
-    pixelMap  = (Pixel*)_mm_malloc(sizeof(Pixel)*no_lines*no_columns, 64);
-    std::copy(old.pixelMap, old.pixelMap+(no_lines*no_columns), pixelMap);
+
+    pixelMap.reserve(no_lines*no_columns);
+    std::copy(old.pixelMap.begin(), old.pixelMap.end(), pixelMap);
 
     file_header = old.getFileHeader();
     info_header = old.getInfoHeader();
@@ -226,7 +217,9 @@ int BMP::readFromFile(char* FileName){
     // Verifica se formato da imagem é aceitável (deve ser ‘BM’)
     if(BMPHdr.Type != (('M' << 8) | 'B')) return -1;
 
-    Pixel *mat  = (Pixel*)_mm_malloc(sizeof(Pixel)*BMPInfHdr.biHeight*BMPInfHdr.biWidth, 64);
+    Image::pixelMap.clear();
+    Image::pixelMap.reserve(BMPInfHdr.biHeight*BMPInfHdr.biWidth);
+
     /*RGBQUAD palette_rs[256];
     int offset = BMPHdr.OffsetBits;
     if (offset != 54){ //Tem paleta
@@ -254,11 +247,10 @@ int BMP::readFromFile(char* FileName){
         }
         for (j=0; j<cols; j++){ //Freaking std::reverse(std::begin(lineBuffer), std::end(lineBuffer));
             RGBTRI bgrP = lineBuffer[linePixels-j-1];
-            mat[i*cols+j] = Pixel(bgrP.rgbRed, bgrP.rgbGreen, bgrP.rgbBlue);
+            Image::pixelMap[i*cols+j] = Pixel(bgrP.rgbRed, bgrP.rgbGreen, bgrP.rgbBlue);
         }
     }
 
-    Image::pixelMap = mat;
     file_header = BMPHdr;
     info_header = BMPInfHdr;
 
@@ -299,14 +291,14 @@ std::cout<<"Write header\n";
     unsigned char color_coding[no_lines][no_columns];
     Output.flush();
     MiscMath m;
-    for (int i=0; i<no_lines; i++){
-        for (int j=0; j<no_columns; j++){
+    for (unsigned int i=0; i<no_lines; i++){
+        for (unsigned int j=0; j<no_columns; j++){
             color_coding[i][j] = m.lookUpPalette(palette, this->getPixel(i,j));
         }
     }
 
     RGBQUAD palette_rs[palette.size()];
-    for (int i=0; i<palette.size(); i++){
+    for (unsigned int i=0; i<palette.size(); i++){
         palette_rs [i] = quadBuilder(palette.at(i));
     }
     Output.write(reinterpret_cast<char *>(&palette_rs), sizeof(palette_rs));
@@ -321,7 +313,7 @@ Output.flush();
     char spareBytes[no_spare_bytes];
 
     unsigned int i,j;
-    unsigned int cols = info_header.biWidth;
+    //unsigned int cols = info_header.biWidth;
     for(i=0; i<info_header.biHeight; i++){
         for(j=0; j<linePixels; j++){
             lineBuffer[j] = color_coding[i][j];
@@ -404,8 +396,9 @@ MBT::MBT(BMP old){
     red_bits   = old.getRedBits();
     green_bits = old.getGreenBits();
     blue_bits  = old.getBlueBits();
-    pixelMap  = (Pixel*)_mm_malloc(sizeof(Pixel)*no_lines*no_columns, 64);
-    std::copy(old.getMap(), old.getMap()+(no_lines*no_columns), pixelMap);
+
+    pixelMap.reserve(no_lines*no_columns);
+    std::copy(old.getMap().begin(), old.getMap().end(), pixelMap);
 
     file_header = old.getFileHeader();
     info_header = old.getInfoHeader();

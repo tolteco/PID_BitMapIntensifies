@@ -72,7 +72,7 @@ class Image{
              unsigned char red_bits,
              unsigned char green_bits,
              unsigned char blue_bits,
-             Pixel* map_of_pixels);
+             std::vector<Pixel> map_of_pixels);
 
         Image(const Image &old);
 
@@ -91,7 +91,7 @@ class Image{
         unsigned char getBlueBits() const;
         unsigned int getHorizontalResolution() const;
         unsigned int getVerticalResolution() const;
-        Pixel* getMap() const; ///I know. Ugly access and stuff.
+        std::vector<Pixel> getMap() const; ///I know. Ugly access and stuff.
 
         ///SETTERS
         void setHorizontalResolution(unsigned int);
@@ -119,7 +119,7 @@ class Image{
         unsigned int pixels_meter_horizontal;
         unsigned int pixels_meter_vertical;
 
-        Pixel* pixelMap;
+        std::vector<Pixel> pixelMap;
 };
 
 class PersistableIMG : public Image {
