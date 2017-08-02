@@ -178,26 +178,9 @@ BMP::BMP(BITMAPFILEHEADER fil, BITMAPINFOHEADER inf, std::vector<Pixel> palette,
     }
 }
 
-BMP::BMP(const BMP& old){
-    no_lines = old.getLines();
-    no_columns = old.getColumns();
-    pixels_meter_horizontal = old.getHorizontalResolution();
-    pixels_meter_vertical = old.getVerticalResolution();
-    red_bits   = old.getRedBits();
-    green_bits = old.getGreenBits();
-    blue_bits  = old.getBlueBits();
-
-    pixelMap.reserve(no_lines*no_columns);
-    std::copy(old.pixelMap.begin(), old.pixelMap.end(), pixelMap);
-
-    file_header = old.getFileHeader();
-    info_header = old.getInfoHeader();
-    if (old.palette.size() > 0){
-        palette.reserve(old.getPalette().size());
-        std::copy(old.getPalette().begin(), old.getPalette().end(), palette.begin());
-        isInBGRformat = old.isBGR();
-    }
-}
+BMP::BMP(const BMP& old)
+   : PersistableIMG(old.getLines(), old.getColumns(), old.getRedBits(), old.getGreenBits(), old.getBlueBits(), old.getMap()),
+     file_header(old.file_header), info_header(old.info_header), palette(old.palette), isInBGRformat(old.isBGR()){ }
 
 BITMAPFILEHEADER BMP::getFileHeader() const{ return file_header; }
 BITMAPINFOHEADER BMP::getInfoHeader() const{ return info_header; }
@@ -383,28 +366,14 @@ unsigned int BMP::BMP_file_size(unsigned int paletteElements, unsigned int lines
 
 ///MBT
 
-MBT::MBT(BMP old){
-    if (old.isBGR()){
+MBT::MBT(BMP old)
+   : PersistableIMG(old.getLines(), old.getColumns(), old.getRedBits(), old.getGreenBits(), old.getBlueBits(), old.getMap()),
+     file_header(old.getFileHeader()), info_header(old.getInfoHeader()), palette(old.getPalette()){
+
+    /*if (old.isBGR()){
         old.changeToBGR();
-    }
+    }*/
 
-    no_lines = old.getLines();
-    no_columns = old.getColumns();
-    pixels_meter_horizontal = old.getHorizontalResolution();
-    pixels_meter_vertical = old.getVerticalResolution();
-    red_bits   = old.getRedBits();
-    green_bits = old.getGreenBits();
-    blue_bits  = old.getBlueBits();
-
-    pixelMap.reserve(no_lines*no_columns);
-    std::copy(old.getMap().begin(), old.getMap().end(), pixelMap);
-
-    file_header = old.getFileHeader();
-    info_header = old.getInfoHeader();
-    if (old.getPalette().size() > 0){
-        palette.reserve(old.getPalette().size());
-        std::copy(old.getPalette().begin(), old.getPalette().end(), palette.begin());
-    }
     color = MBT::ColorSpace::RGB;
 }
 
