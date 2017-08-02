@@ -28,7 +28,7 @@ Image::Image(const Image &old)
        pixelMap(old.pixelMap){ }
 
 ///GETTERS
-Pixel         Image::getPixel(unsigned int i, unsigned int j) const{ return Pixel(pixelMap[i*this->no_columns+j]); }
+Pixel         Image::getPixel(unsigned int i, unsigned int j) const{ return pixelMap[i*this->no_columns+j]; } //return Pixel(pixelMap[i*this->no_columns+j]); }
 unsigned int  Image::getLines() const{ return no_lines; }
 unsigned int  Image::getColumns() const{ return no_columns; }
 unsigned char Image::getBitsPerColor() const{ return red_bits + green_bits + blue_bits; }
@@ -199,8 +199,16 @@ int BMP::readFromFile(char* FileName){
     // Verifica se formato da imagem é aceitável (deve ser ‘BM’)
     if(BMPHdr.Type != (('M' << 8) | 'B')) return -1;
 
+    unsigned int lines = BMPInfHdr.biHeight;
+    unsigned int cols = BMPInfHdr.biWidth;
+    unsigned int lines_and_cols = lines*cols;
     Image::pixelMap.clear();
-    Image::pixelMap.reserve(BMPInfHdr.biHeight*BMPInfHdr.biWidth);
+    Image::pixelMap.reserve(lines_and_cols);
+
+    unsigned int i,j;
+    for (i=0; i<lines_and_cols; i++){ //Create "n" "empty" positions
+        Image::pixelMap.push_back(Pixel());
+    }
 
     /*RGBQUAD palette_rs[256];
     int offset = BMPHdr.OffsetBits;
@@ -212,15 +220,14 @@ int BMP::readFromFile(char* FileName){
     }*/
 
     MiscMath mscm; ///Generalizar para diferente de True color
-    unsigned int linePixels = BMPInfHdr.biWidth;
+    unsigned int linePixels = cols;
     unsigned int lineBytes = mscm.roundUpToNearestMultiple(linePixels*3, 4);
 
     RGBTRI lineBuffer[linePixels];
     unsigned int no_spare_bytes = lineBytes - (linePixels*3);
     char spareBytes[no_spare_bytes];
 
-    unsigned int i,j;
-    unsigned int cols = BMPInfHdr.biWidth;
+
     for(i=0; i<BMPInfHdr.biHeight; i++){ //Read lines
         InputStream.read((char*)&lineBuffer, sizeof(lineBuffer));
 
@@ -273,6 +280,7 @@ std::cout<<"Write header\n";
     unsigned char color_coding[no_lines][no_columns];
     Output.flush();
     MiscMath m;
+    #pragma omp parallel for
     for (unsigned int i=0; i<no_lines; i++){
         for (unsigned int j=0; j<no_columns; j++){
             color_coding[i][j] = m.lookUpPalette(palette, this->getPixel(i,j));
@@ -280,6 +288,7 @@ std::cout<<"Write header\n";
     }
 
     RGBQUAD palette_rs[palette.size()];
+    #pragma omp parallel for
     for (unsigned int i=0; i<palette.size(); i++){
         palette_rs [i] = quadBuilder(palette.at(i));
     }
@@ -366,7 +375,7 @@ unsigned int BMP::BMP_file_size(unsigned int paletteElements, unsigned int lines
 
 ///MBT
 
-MBT::MBT(BMP old)
+MBT::MBT(const BMP& old)
    : PersistableIMG(old.getLines(), old.getColumns(), old.getRedBits(), old.getGreenBits(), old.getBlueBits(), old.getMap()),
      file_header(old.getFileHeader()), info_header(old.getInfoHeader()), palette(old.getPalette()){
 

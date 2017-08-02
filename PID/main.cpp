@@ -117,15 +117,15 @@ void test6(){
 
     cout << "Quantizou.\nPaleta size: " << imag.getPalette().size() << endl;
     cout << imag.getPixel(100,100);
-    BMP nimag = BMP(imag);
-    cout << endl << nimag << endl;
-    cout << nimag.getPixel(0,0);
+    imag = newImag.constructBMP();
+    cout << endl << imag << endl;
+    cout << imag.getPixel(0,0);
     //t1 = imag.getPixel(0,0)+Pixel(48,48,48);
     //cout << "Pixel after: " << t1;
 
     cout << "\nBefore write...\n";
 
-    //nimag.writeToFile("out.bmp");
+    imag.writeToFile("out.bmp");
 
     return;
 }

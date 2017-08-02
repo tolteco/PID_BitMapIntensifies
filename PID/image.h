@@ -180,7 +180,7 @@ class MBT : public PersistableIMG {
         }ColorSpace;
 
         MBT() {};
-        MBT(BMP old);
+        MBT(const BMP& old);
 
         BITMAPFILEHEADER getFileHeader() const;
         BITMAPINFOHEADER getInfoHeader() const;
