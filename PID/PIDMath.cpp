@@ -101,8 +101,8 @@ void MatrixOperation::multiplySum(double mult[3][3], double sum[3], Pixel* mat, 
 
 ///MISC MATH
 unsigned char MiscMath::lookUpPalette(std::vector<Pixel> palette, Pixel color){
-    for(unsigned char i=0; i<palette.size(); i++){
-        if(palette.at(i) == color) return i;
+    for(unsigned short i=0; i<palette.size(); i++){
+        if(palette.at(i) == color) return (unsigned char) i;
     }
     return 0;
 }

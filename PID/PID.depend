@@ -30,7 +30,7 @@
 	"pixel.h"
 	"image.h"
 
-1501691152 source:c:\users\jfps\documents\github\pid_bitmapintensifies\pid\image.cpp
+1501713215 source:c:\users\jfps\documents\github\pid_bitmapintensifies\pid\image.cpp
 	<iostream>
 	<string>
 	<algorithm>
@@ -39,7 +39,7 @@
 	"image.h"
 	"PIDMath.h"
 
-1501690846 source:c:\users\jfps\documents\github\pid_bitmapintensifies\pid\main.cpp
+1501713858 source:c:\users\jfps\documents\github\pid_bitmapintensifies\pid\main.cpp
 	<omp.h>
 	<iostream>
 	<algorithm>
@@ -50,7 +50,7 @@
 	<vector>
 	<iterator>
 
-1501554529 source:c:\users\jfps\documents\github\pid_bitmapintensifies\pid\pidmath.cpp
+1501711233 source:c:\users\jfps\documents\github\pid_bitmapintensifies\pid\pidmath.cpp
 	<omp.h>
 	<math.h>
 	<iostream>

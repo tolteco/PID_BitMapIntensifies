@@ -170,11 +170,14 @@ BMP::BMP(BITMAPFILEHEADER fil, BITMAPINFOHEADER inf, std::vector<Pixel> palette,
 
     if(palette.size() > 0){
         file_header.OffsetBits = 54 + (palette.size()*4);
-        info_header.biSize = BMP::BMP_file_size(palette.size(), no_lines, no_columns, 8);
+        file_header.Size = BMP::BMP_file_size(palette.size(), no_lines, no_columns, 8);
         info_header.biBitCount = 8;
+        std::cout<<"Build here. Size: " << info_header.biSize << " Bit: " << info_header.biBitCount << "\n";
+        info_header.biSizeImage=0;
     } else {
         file_header.OffsetBits = 54;
         info_header.biSize = BMP::BMP_file_size(palette.size(), no_lines, no_columns, 24);
+        info_header.biSizeImage = info_header.biSize-54;
     }
 }
 
@@ -280,15 +283,15 @@ std::cout<<"Write header\n";
     unsigned char color_coding[no_lines][no_columns];
     Output.flush();
     MiscMath m;
-    #pragma omp parallel for
+    //#pragma omp parallel for
     for (unsigned int i=0; i<no_lines; i++){
         for (unsigned int j=0; j<no_columns; j++){
             color_coding[i][j] = m.lookUpPalette(palette, this->getPixel(i,j));
         }
     }
-
+    std::cout<<"Over, anakin\n";
     RGBQUAD palette_rs[palette.size()];
-    #pragma omp parallel for
+    //#pragma omp parallel for
     for (unsigned int i=0; i<palette.size(); i++){
         palette_rs [i] = quadBuilder(palette.at(i));
     }
@@ -307,12 +310,13 @@ Output.flush();
     //unsigned int cols = info_header.biWidth;
     for(i=0; i<info_header.biHeight; i++){
         for(j=0; j<linePixels; j++){
-            lineBuffer[j] = color_coding[i][j];
+            lineBuffer[linePixels-j-1] = color_coding[i][j];
         }
         Output.write((char*)&lineBuffer, sizeof(lineBuffer));
         if (no_spare_bytes != 0){
            Output.write((char*)&spareBytes, sizeof(spareBytes));
         }
+
     }
     Output.close();
 
