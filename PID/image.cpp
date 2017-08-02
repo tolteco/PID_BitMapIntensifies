@@ -151,20 +151,19 @@ Image Image::operator*(const Pixel& constant) {
     return px;
 }
 
+///Persistable IMG
+PersistableIMG::PersistableIMG(unsigned int lines, unsigned int columns,
+                unsigned char red_bits,
+                unsigned char green_bits,
+                unsigned char blue_bits,
+                std::vector<Pixel> map_of_pixels)
+             : Image(lines, columns, red_bits, green_bits, blue_bits, map_of_pixels){}
+
 ///BMP
 
-BMP::BMP(BITMAPFILEHEADER fil, BITMAPINFOHEADER inf, std::vector<Pixel> palette, MBT* i)
-   : file_header(fil), info_header(inf), palette(palette) {
-    no_lines = i->getLines();
-    no_columns = i->getColumns();
-    pixels_meter_horizontal = i->getHorizontalResolution();
-    pixels_meter_vertical = i->getVerticalResolution();
-    red_bits   = i->getRedBits();
-    green_bits = i->getGreenBits();
-    blue_bits  = i->getBlueBits();
-
-    pixelMap.reserve(no_lines*no_columns);
-    std::copy(i->getMap().begin(), i->getMap().end(), pixelMap);
+BMP::BMP(BITMAPFILEHEADER fil, BITMAPINFOHEADER inf, std::vector<Pixel> palette, MBT* i) //https://stackoverflow.com/questions/120876/what-are-the-rules-for-calling-the-superclass-constructor
+   : PersistableIMG(i->getLines(), i->getColumns(), i->getRedBits(), i->getGreenBits(), i->getBlueBits(), i->getMap()),
+     file_header(fil), info_header(inf), palette(palette) {
 
     file_header.Reserved2 = 0;
     file_header.Reserved = 0;

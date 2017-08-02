@@ -126,6 +126,13 @@ class PersistableIMG : public Image {
     public:
         virtual int writeToFile (char* FileName) = 0;
         virtual int readFromFile(char* FileName) = 0;
+    protected:
+        PersistableIMG() {};
+        PersistableIMG(unsigned int lines, unsigned int columns,
+             unsigned char red_bits,
+             unsigned char green_bits,
+             unsigned char blue_bits,
+             std::vector<Pixel> map_of_pixels); //Só chamável por subclasses. Serve como modelo Bridge
 };
 class MBT;
 //REF. NOTAS DE AULA DE PID :D
