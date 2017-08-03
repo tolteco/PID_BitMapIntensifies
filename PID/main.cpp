@@ -94,34 +94,23 @@ void test5(){
 }
 
 void test6(){
-    char* name = "Tucano.bmp";
+    char* name = "Gaviao.bmp";
     BMP imag = BMP();
     int i=imag.readFromFile(name);
     cout << "Leu imagem: " << imag << endl;
-    Pixel t1 = imag.getPixel(0,0);
-    t1 = t1+Pixel(48,48,48);
-    cout << "Pixel before: " << t1;
     MBT newImag = MBT(imag);
-    cout << "MBT: " << newImag.getLines() << endl;
-    Pixel t2 = newImag.getPixel(0,0);
     cout << "\nTransformou.\n";
-
     newImag.changeColorSpace(MBT::ColorSpace::YUV);
-    Pixel t3 = newImag.getPixel(0,0);
     cout << "Converteu para YUV\n";
 
     Quantization q;
-    vector<Pixel> palette = q.medianCut2ndAnd3rdChannels(&imag, 256);
+    vector<Pixel> palette = q.medianCut2ndAnd3rdChannels(&newImag, 256);
     newImag.setPalette(palette);
     imag = newImag.constructBMP();
 
     cout << "Quantizou.\nPaleta size: " << imag.getPalette().size() << endl;
-    cout << imag.getPixel(100,100);
     imag = newImag.constructBMP();
     cout << endl << imag << endl;
-    cout << imag.getPixel(0,0);
-    //t1 = imag.getPixel(0,0)+Pixel(48,48,48);
-    //cout << "Pixel after: " << t1;
 
     cout << "\nBefore write...\n";
 

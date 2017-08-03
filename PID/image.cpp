@@ -172,7 +172,6 @@ BMP::BMP(BITMAPFILEHEADER fil, BITMAPINFOHEADER inf, std::vector<Pixel> palette,
         file_header.OffsetBits = 54 + (palette.size()*4);
         file_header.Size = BMP::BMP_file_size(palette.size(), no_lines, no_columns, 8);
         info_header.biBitCount = 8;
-        std::cout<<"Build here. Size: " << info_header.biSize << " Bit: " << info_header.biBitCount << "\n";
         info_header.biSizeImage=0;
     } else {
         file_header.OffsetBits = 54;
@@ -406,10 +405,12 @@ void MBT::changeColorSpace(MBT::ColorSpace color_space){
     if (color_space == YUV){
         std::cout<<"Entrou em toYUV\n";
         c.toYUV(pixelMap, no_lines, no_columns);
+        c.toYUV(palette, palette.size());
         color = MBT::ColorSpace::YUV;
     } else if (color_space == RGB){
         std::cout<<"Entrou em toRGB\n";
         c.toRGB(pixelMap, no_lines, no_columns);
+        c.toRGB(palette, palette.size());
         color = MBT::ColorSpace::RGB;
     }
     std::cout<<"Saiu de ChangeColorSpace\n";

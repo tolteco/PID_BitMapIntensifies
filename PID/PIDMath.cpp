@@ -104,6 +104,7 @@ unsigned char MiscMath::lookUpPalette(std::vector<Pixel> palette, Pixel color){
     for(unsigned short i=0; i<palette.size(); i++){
         if(palette.at(i) == color) return (unsigned char) i;
     }
+    std::cout<<"Zero!\n";
     return 0;
 }
 
@@ -121,6 +122,25 @@ unsigned int MiscMath::roundUpToNearestMultiple(unsigned int num, unsigned int m
 ///QUANTIZATION
 #include <vector>
 #include <algorithm>
+
+static inline int pixel_distance(Pixel p1, Pixel p2) {
+    return abs(p1.get1st() - p2.get1st()) +
+           abs(p1.get2nd() - p2.get2nd()) +
+           abs(p1.get3rd() - p2.get3rd());
+}
+
+static inline int px_mapper(Pixel pixel, const std::vector<Pixel> &pal) {
+    int idx = 0;
+    int current_distance = INT_MAX;
+    for (int i=0; i<pal.size(); ++i) {
+        int dist = pixel_distance(pixel, pal.at(i));
+        if (dist < current_distance) {
+            current_distance = dist;
+            idx = i;
+        }
+    }
+    return idx;
+}
 
 //http://www.vogella.com/tutorials/JavaAlgorithmsQuicksort/article.html
 void quick_sort(std::vector<Pixel>* arr, int beg, int end, char chnl){
@@ -210,23 +230,14 @@ std::cout << "Divisão completa. B: " << p_lists.size() << "\n";
         palette.push_back( sub_lista.at(sub_lista.size()/2) ); //adiciona a cor mediana de cada sub lista
     }
 
-    #pragma omp parallel for
+    Pixel p;
+    #pragma omp parallel for private(p)
     for(unsigned int i=0; i<lines; i++){
         for (unsigned int j=0; j<cols; j++){
-            Pixel p = img->getPixel(i,j);
-            //std::cout << "Pixel save. " << p << "\n";
-            for (unsigned int k=0; k<p_lists.size(); k++){
-                sub_lista = p_lists.at(k);
-                //std::cout<< k << "\n";
-                if(std::find(sub_lista.begin(), sub_lista.end(), p) != sub_lista.end()){
-                    img->setPixel(palette.at(k), i, j);
-                    //std::cout << "Encontrado na lista: " << k << "Mapeado para: " << palette.at(k) << "\n";
-                    k=p_lists.size(); //Break this if and inner for
-                }
-            }
+            p = img->getPixel(i,j);
+            img->setPixel( palette[px_mapper(p, palette)], i, j);
         }
     }
-
     std::cout << "Mapeamento de pixels completo.\n";
 
     //img->setBitsPerColor(8);
