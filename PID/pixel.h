@@ -36,6 +36,7 @@ class Pixel{
         //Use as funções "moreThan", "lessThan", ou similar para tal
         //bool   operator<(const Pixel& lhs, const Pixel& rhs);
 
+        void channelSwap(unsigned char chnl1, unsigned char chnl2);
         bool moreThan(Pixel b, char channel);
         bool lessThan(Pixel b, char channel);
         static bool moreThan(Pixel a, Pixel b, char channel);

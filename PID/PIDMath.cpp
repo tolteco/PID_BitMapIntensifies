@@ -132,7 +132,7 @@ static inline int pixel_distance(Pixel p1, Pixel p2) {
 static inline int px_mapper(Pixel pixel, const std::vector<Pixel> &pal) {
     int idx = 0;
     int current_distance = INT_MAX;
-    for (int i=0; i<pal.size(); ++i) {
+    for (unsigned int i=0; i<pal.size(); ++i) {
         int dist = pixel_distance(pixel, pal.at(i));
         if (dist < current_distance) {
             current_distance = dist;
@@ -144,24 +144,24 @@ static inline int px_mapper(Pixel pixel, const std::vector<Pixel> &pal) {
 
 //http://www.vogella.com/tutorials/JavaAlgorithmsQuicksort/article.html
 void quick_sort(std::vector<Pixel>* arr, int beg, int end, char chnl){
-        Pixel pivot = arr->at(beg + (end-beg)/2);
+    Pixel pivot = arr->at(beg + (end-beg)/2);
 
-        int begC = beg,
-            endC = end;
+    int begC = beg,
+        endC = end;
 
-        while(begC <= endC){
-            while(arr->at(begC).moreThan(pivot, chnl)) ++begC;
-            while(arr->at(endC).lessThan(pivot, chnl)) --endC;
+    while(begC <= endC){
+        while(arr->at(begC).moreThan(pivot, chnl)) ++begC;
+        while(arr->at(endC).lessThan(pivot, chnl)) --endC;
 
-            if (begC <= endC){
-                iter_swap(arr->begin() + begC, arr->begin() + endC);
-                ++begC;
-                --endC;
-            }
+        if (begC <= endC){
+            iter_swap(arr->begin() + begC, arr->begin() + endC);
+            ++begC;
+            --endC;
         }
+    }
 
-        if (beg < endC) quick_sort(arr, beg, endC, chnl);
-        if (begC < end) quick_sort(arr, begC, end, chnl);
+    if (beg < endC) quick_sort(arr, beg, endC, chnl);
+    if (begC < end) quick_sort(arr, begC, end, chnl);
 }
 
 int chnl_range(std::vector<unsigned char> arr1){
@@ -196,16 +196,12 @@ std::vector<Pixel> Quantization::medianCut2ndAnd3rdChannels(Image* img, unsigned
             pixels.push_back(img->getPixel(i,j));
         }
     }
-std::cout << "Pixels postos no primeiro vector\n";
 
     //http://www.cplusplus.com/forum/general/833/
     std::vector<std::vector<Pixel>> p_lists;
     p_lists.push_back(pixels);
-std::cout << "Pixels postos no vector de vectors\n";
     while(p_lists.size() < maxColors){ //Main loop
-
         unsigned int lists_size = p_lists.size();
-std::cout << "Size: " << lists_size << "\n";
         for (unsigned int i=0; i<lists_size; lists_size--){
             char b_range = chnl_with_greatest_range(p_lists.at(i)); //Canal com maior range
             quick_sort(&p_lists.at(i), 0, p_lists.at(i).size()-1, b_range); //Sort de acordo com o canal
@@ -215,10 +211,10 @@ std::cout << "Size: " << lists_size << "\n";
                                f_3(temp.begin() + temp.size()/2, temp.end());
             p_lists.erase(p_lists.begin()+i); p_lists.push_back(f_2); p_lists.push_back(f_3); //Adiciona novas listas no fim
         }
-std::cout << "Finalizou iteracao. Subs: " << p_lists.size() << "\n";
+        #ifdef LOG_PRINT
+            std::cout << "Iteracao da quantizacao completa. Cores:" << p_lists.size() << ".\n";
+        #endif // LOG_PRINT
     }
-
-std::cout << "Divisão completa. B: " << p_lists.size() << "\n";
 
     std::vector<Pixel> palette;
     palette.reserve(p_lists.size());
@@ -238,7 +234,10 @@ std::cout << "Divisão completa. B: " << p_lists.size() << "\n";
             img->setPixel( palette[px_mapper(p, palette)], i, j);
         }
     }
-    std::cout << "Mapeamento de pixels completo.\n";
+
+    #ifdef LOG_PRINT
+        std::cout << "Quantização completa.\n";
+    #endif // LOG_PRINT
 
     //img->setBitsPerColor(8);
     //Image ret = Image(img);

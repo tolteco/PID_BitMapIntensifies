@@ -8,6 +8,8 @@
 #define BLOCK_SIZE 16
 #define ROUND_UP(x, s) (((x)+((s)-1)) & -(s))
 
+#define LOG_PRINT 1
+
 class MatrixOperation{
     public:
         ~MatrixOperation() {};

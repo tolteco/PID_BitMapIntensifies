@@ -209,3 +209,34 @@ bool Pixel::lessThan(Pixel a, Pixel b, char channel){
     if (a_value < b_value) return true;
     else return false;
 }
+
+/*void swapUCHAR(unsigned char *a, unsigned char *b){
+    unsigned char temp;
+    temp = *a;
+    *a = *b;
+    *b = temp;
+} */
+
+void Pixel::channelSwap(unsigned char chnl1, unsigned char chnl2){
+    if(chnl1 == chnl2) return;
+
+    unsigned char chnl1_bits, chnl2_bits;
+
+    if      (chnl1 == 0) chnl1_bits = this->first;
+    else if (chnl1 == 1) chnl1_bits = this->second;
+    else                 chnl1_bits = this->third;
+
+    if      (chnl2 == 0) chnl2_bits = this->first;
+    else if (chnl2 == 1) chnl2_bits = this->second;
+    else                 chnl2_bits = this->third;
+
+    std::swap(chnl1_bits, chnl2_bits);
+
+    if      (chnl1 == 0) this->first  = chnl1_bits;
+    else if (chnl1 == 1) this->second = chnl1_bits;
+    else                 this->third  = chnl1_bits;
+
+    if      (chnl2 == 0) this->first  = chnl2_bits;
+    else if (chnl2 == 1) this->second = chnl2_bits;
+    else                 this->third  = chnl2_bits;
+}

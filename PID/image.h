@@ -1,6 +1,7 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
+#include <string>
 #include <vector>
 
 ///Explosion warning:
@@ -10,6 +11,9 @@ do BMP (Com o mesmo nome que as abaixo)
 também sejam incluídas. Possíveis
 problemas de desalinhamento.
 */
+
+#define LOG_PRINT 1
+
 
 typedef unsigned char BYTE;
 typedef unsigned short WORD;
@@ -124,8 +128,8 @@ class Image{
 
 class PersistableIMG : public Image {
     public:
-        virtual int writeToFile (char* FileName) = 0;
-        virtual int readFromFile(char* FileName) = 0;
+        virtual int writeToFile (std::string FileName) = 0;
+        virtual int readFromFile(std::string FileName) = 0;
     protected:
         PersistableIMG() {};
         PersistableIMG(unsigned int lines, unsigned int columns,
@@ -134,6 +138,7 @@ class PersistableIMG : public Image {
              unsigned char blue_bits,
              std::vector<Pixel> map_of_pixels); //Só chamável por subclasses. Serve como modelo Bridge
 };
+
 class MBT;
 //REF. NOTAS DE AULA DE PID :D
 class BMP : public PersistableIMG {
@@ -152,8 +157,8 @@ class BMP : public PersistableIMG {
         std::vector<Pixel> getPalette() const;
         bool isBGR() const;
 
-        int readFromFile(char* FileName) override;
-        int writeToFile (char* FileName) override;
+        int readFromFile(std::string FileName) override;
+        int writeToFile (std::string FileName) override;
         void changeToBGR();
 
     static unsigned int BMP_file_size(unsigned int paletteElements, unsigned int lines, unsigned int cols, unsigned char bitsPerColor);
@@ -162,13 +167,15 @@ class BMP : public PersistableIMG {
 
     private:
         BITMAPFILEHEADER file_header;
-        //BITMAPINFO info;
         BITMAPINFOHEADER info_header;
         std::vector<Pixel> palette;
         bool isInBGRformat = false;
 
         void swap1stAnd3rdChannels();  //BMP armazenados em BGR
-        //void reorderBMPcolumns(); //Armazena-se primeiro a ultima coluna da primeira linha
+        void writeWithPalette(std::ofstream& Output);
+        void writeWithoutPalette(std::ofstream& Output);
+        void readWithPalette(std::ifstream& InputStream);
+        void readWithoutPalette(std::ifstream& InputStream);
 };
 
 //Formato próprio - Mapa de BiTs - MBT
@@ -176,7 +183,8 @@ class MBT : public PersistableIMG {
     public:
         typedef enum tagCOLORSPACE {
             YUV = 0, //Armazenado em YUV
-            RGB = 1  //Armazenado em RGB
+            RGB = 1, //Armazenado em RGB
+            HSV = 2
         }ColorSpace;
 
         MBT() {};
@@ -184,11 +192,17 @@ class MBT : public PersistableIMG {
 
         BITMAPFILEHEADER getFileHeader() const;
         BITMAPINFOHEADER getInfoHeader() const;
-        std::vector<Pixel> getPalette() const;
+        std::vector<Pixel> getPalette()  const;
         void setPalette(std::vector<Pixel> pal);
+        unsigned short getBitsPerColor () const;
+        unsigned char get1stChannelBits() const;
+        unsigned char get2ndChannelBits() const;
+        unsigned char get3rdChannelBits() const;
+        unsigned char get4thChannelBits() const;
+        ColorSpace getColorSpace() const;
 
-        int readFromFile(char* FileName) override;
-        int writeToFile (char* FileName) override;
+        int readFromFile(std::string FileName) override;
+        int writeToFile (std::string FileName) override;
         void changeColorSpace(ColorSpace color_space);
         BMP constructBMP();
 
@@ -198,14 +212,31 @@ class MBT : public PersistableIMG {
         std::vector<Pixel> palette;
         ColorSpace color = RGB;
 
-        ///Campo reservado2 do BMP pode ser usado para
-        ///quando tempos num de bits diferentes entre
-        ///canais, onde cada byte (dos 3 mais significativos)
-        ///indica o tanto de bits por cor. Ex.: 5-6-5
-        ///Reservado2 0101 0110 0101 0000
-        ///             5    6    5        (RGB - 1st, 2nd, 3rd)
+        void writeWithPalette(std::ofstream& Output);
+        void writeWithoutPalette(std::ofstream& Output);
+        void readWithPalette(std::ifstream& InputStream);
+        void readWithoutPalette(std::ifstream& InputStream);
+
+        /*
+        Campos do FileHeader (BMP) com diferentes propositos:
+
+        -- BfType = "MB"
+        -- BfSize = ColorSpace (0, RGB; 1, YUV; 2, HSV)
+        -- BfReser1 = Byte mais alto para bits do primeiro canal, depois do segundo canal;
+        -- BfReser2 = Byte mais alto para bits do terceiro canal, depois do quarto (Se não houver, 0);
+        -- BiSize = Tamanho da paleta; 0 se inexistente
+        */
 };
 
+/*#ifdef HORIZONTAL_FLIP
+    //int
+#elifdef VERTICAL_FLIP
+    //int
+#elifdef BOTH_FLIP
+    //int
+#else
+    //int
+#endif // HORIZONTAL_FLIP*/
 
 
 #endif

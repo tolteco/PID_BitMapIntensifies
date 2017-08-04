@@ -14,6 +14,14 @@
 
 ############ CONSIDERAÇÕES EXTRAS ##########################
 
+- Formato MBT: "Extensão do BMP", isto é, mesmo número de campos mas possuem outros propósitos.
+
+-- BfType = "MB"
+-- BfSize = ColorSpace (0, RGB; 1, YUV; 2, HSV)
+-- BfReser1 = Byte mais alto para bits do primeiro canal, depois do segundo canal;
+-- BfReser2 = Byte mais alto para bits do terceiro canal, depois do quarto (Se não houver, 0);
+--
+
 
 
 
