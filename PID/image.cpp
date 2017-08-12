@@ -168,12 +168,13 @@ BMP::BMP(BITMAPFILEHEADER fil, BITMAPINFOHEADER inf, std::vector<Pixel> palette,
 
     file_header.Reserved2 = 0;
     file_header.Reserved = 0;
-
+    file_header.Type = 0x4D42;
     if(palette.size() > 0){
         file_header.OffsetBits = 54 + (palette.size()*4);
         file_header.Size = BMP::BMP_file_size(palette.size(), no_lines, no_columns, 8);
+        info_header.biSize = 40;
         info_header.biBitCount = 8;
-        info_header.biSizeImage=0;
+        info_header.biSizeImage= 0;
     } else {
         file_header.OffsetBits = 54;
         info_header.biSize = BMP::BMP_file_size(palette.size(), no_lines, no_columns, 24);
@@ -233,7 +234,6 @@ int BMP::readFromFile(std::string FileName){
     unsigned int no_spare_bytes = lineBytes - (linePixels*3);
     char spareBytes[no_spare_bytes];
 
-
     for(i=0; i<BMPInfHdr.biHeight; i++){ //Read lines
         InputStream.read((char*)&lineBuffer, sizeof(lineBuffer));
 
@@ -278,11 +278,11 @@ RGBQUAD quadBuilder(Pixel p){
     return quad;
 }
 
-void writeWithPalette(std::ofstream& Output){
+void BMP::writeWithPalette(std::ofstream& Output){
 
 }
 
-void writeWithoutPalette(std::ofstream& Output){
+void BMP::writeWithoutPalette(std::ofstream& Output){
 
 }
 
@@ -430,7 +430,7 @@ void MBT::changeColorSpace(MBT::ColorSpace color_space){
 }
 
 void MBT::readWithPalette(std::ifstream& InputStream){
-
+    std::cout<<"Read pal\n\n\n\n";
 }
 
 void MBT::readWithoutPalette(std::ifstream& InputStream){
@@ -444,13 +444,13 @@ void MBT::readWithoutPalette(std::ifstream& InputStream){
     for (i=0; i<lines_and_cols; i++){ //Create "n" "empty" positions
         Image::pixelMap.push_back(Pixel());
     }
-
     RGBTRI lineBuffer[cols];
 
     for(i=0; i<lines; i++){ //Read lines
         InputStream.read((char*)&lineBuffer, sizeof(lineBuffer));
         for (j=0; j<cols; j++){
-            RGBTRI bgrP = lineBuffer[cols-j-1];
+            //RGBTRI bgrP = lineBuffer[cols-j-1]; //Invertido para passar para BMP
+            RGBTRI bgrP = lineBuffer[j];
             Image::pixelMap[i*cols+j] = Pixel(bgrP.rgbBlue, bgrP.rgbGreen, bgrP.rgbRed);
         }
     }
@@ -464,16 +464,16 @@ int MBT::readFromFile(std::string FileName){
     BITMAPINFOHEADER BMPInfHdr;
     InputStream.read(reinterpret_cast<char *>(&BMPHdr), sizeof(BITMAPFILEHEADER));
     InputStream.read(reinterpret_cast<char *>(&BMPInfHdr), sizeof(BITMAPINFOHEADER));
-
+    std::cout<<"Read header\n";
     file_header = BMPHdr;
     info_header = BMPInfHdr;
 
     Image::no_lines = info_header.biHeight;
     Image::no_columns = info_header.biWidth;
-
+    std::cout<<"Assign\n";
     // Verifica se formato da imagem é aceitável (deve ser ‘MB’)
     if(BMPHdr.Type != (('B' << 8) | 'M')) return -1;
-
+    std::cout<<"Is MB type\n";
     if(info_header.biSize > 0){ readWithPalette(InputStream); }
     else { readWithoutPalette(InputStream); }
 
@@ -531,17 +531,15 @@ void MBT::writeWithoutPalette(std::ofstream& Output){
     unsigned int cols = info_header.biWidth;
     unsigned int lines = info_header.biHeight;
     unsigned int i,j;
-    RGBTRI buffer[cols][lines];
-
+    RGBTRI buffer[lines][cols];
     Pixel p;
-    #pragma omp parallel for private(p)
+
     for(i=0; i<lines; i++){
         for (j=0; j<cols; j++){
             p = Image::getPixel(i,j);
             buffer[i][j] = triBuilder(p);
         }
     }
-
     for(i=0; i<lines; i++){
         Output.write((char*)&buffer[i], sizeof(buffer[i]));
     }
@@ -549,7 +547,8 @@ void MBT::writeWithoutPalette(std::ofstream& Output){
 
 int MBT::writeToFile(std::string FileName){
     std::ofstream Output(FileName,std::ofstream::binary); //Não verifica se ha arquivo já existente
-
+    file_header.Type = 0x424D;
+    info_header.biSize = 0;
     Output.write(reinterpret_cast<char *>(&file_header), sizeof(BITMAPFILEHEADER));
     Output.write(reinterpret_cast<char *>(&info_header), sizeof(BITMAPINFOHEADER));
 

@@ -26,6 +26,21 @@ void test7(){
     return;
 }
 
+void test8(){
+    MBT newImag = MBT();
+    newImag.readFromFile("out.mbt");
+    //newImag.changeColorSpace(MBT::ColorSpace::RGB);
+    Quantization q;
+    std::vector<Pixel> palette = q.medianCut2ndAnd3rdChannels(&newImag, 256);
+    newImag.setPalette(palette);
+    BMP imag = BMP();
+    newImag.changeColorSpace(MBT::ColorSpace::RGB);
+    imag = newImag.constructBMP();
+    imag.writeToFile("out.bmp");
+
+    return;
+}
+
 int main(int argc, char *argv[]) {
     if (omp_get_max_threads() > OMP_THREADS)
         omp_set_num_threads(OMP_THREADS);
@@ -49,8 +64,40 @@ int main(int argc, char *argv[]) {
     }
 
     //Ou faz o teste manualmente
-    //test7();
+    test7();
 
     return 0;
 }
 
+
+
+/* C++ Links
+https://stackoverflow.com/questions/11747954/c-inheritance-in-separate-files-using-include-and-inclusion-guards
+
+https://stackoverflow.com/questions/12854778/abstract-class-vs-interface-in-c
+
+https://stackoverflow.com/questions/318064/how-do-you-declare-an-interface-in-c
+
+https://stackoverflow.com/questions/4421706/what-are-the-basic-rules-and-idioms-for-operator-overloading
+
+https://stackoverflow.com/questions/32810252/return-this-or-this-in-operator-overloading
+
+*/
+
+/* MAYBE USEFUL IN THE NEAR FUTURE LINKS
+
+https://stackoverflow.com/questions/874298/c-templates-that-accept-only-certain-types
+
+https://stackoverflow.com/questions/500493/c-equivalent-of-instanceof
+
+*/
+
+/* IMAGE RELATED LINKS
+
+https://en.wikipedia.org/wiki/YUV
+
+http://www.equasys.de/colorconversion.html
+
+
+
+*/
