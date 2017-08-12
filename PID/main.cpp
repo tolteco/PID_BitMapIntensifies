@@ -9,6 +9,15 @@
 
 #define OMP_THREADS 4
 
+const std::string FULL_ARG = "-full";
+const std::string WRITE_MBT_ARG = "-write";
+const std::string READ_MBT_ARG = "-read";
+
+void valid_input_text();
+void full_op(std::string filename);
+void write_op(std::string filename);
+void read_op(std::string filename);
+
 void test7(){
     std::string name = "Tucano.bmp";
     BMP imag = BMP();
@@ -45,31 +54,72 @@ int main(int argc, char *argv[]) {
     if (omp_get_max_threads() > OMP_THREADS)
         omp_set_num_threads(OMP_THREADS);
 
-    if(argc >= 2){
-        std::string file(argv[1]);
+    if(argc == 3){
+        std::string option(argv[1]);
+        std::string file(argv[2]);
 
-        BMP bitmap = BMP();
-        bitmap.readFromFile(file);
-        MBT mapaBit = MBT(bitmap);
-        mapaBit.writeToFile("PID_OUT.mbt");
-        mapaBit.readFromFile("PID_OUT.mbt");
-        mapaBit.changeColorSpace(MBT::ColorSpace::YUV);
-        Quantization q;
-        std::vector<Pixel> palette = q.medianCut2ndAnd3rdChannels(&mapaBit, 256);
-        mapaBit.setPalette(palette);
-        bitmap = mapaBit.constructBMP();
-        bitmap.writeToFile("PID_OUT.bmp");
+        if (option == FULL_ARG){
+            full_op(file);
+        } else if (option == WRITE_MBT_ARG){
+            full_op(file);
+        } else if (option == READ_MBT_ARG){
+            full_op(file);
+        } else {
+            valid_input_text();
+        }
+    } else if (argc == 2) {
+        std::string file(argv[1]);
+        full_op(file);
     } else {
-        std::cout<<"Passe uma string com o nome do arquivo BMP em TrueColor, sem compressao\n";
+        valid_input_text();
     }
 
     //Ou faz o teste manualmente
-    test7();
+    //test8();
 
     return 0;
 }
 
+void valid_input_text(){
+    std::cout<<"Argumentos: [-ARG] + nome do arquivo de entrada. ARG=\n";
+    std::cout<<"-full  : Escreve um arquivo MBT do BMP, le o arquivo, quantiza e escreve BMP de saida;\n";
+    std::cout<<"-write : Escreve um arquivo MBT do BMP;\n";
+    std::cout<<"-read  : Le um MBT, quantiza e escreve BMP de saida.\n";
+    std::cout<<"\nSe for passado somente arquivo de entrada, o procedimento sera o mesmo de \"-full\".\n";
+}
 
+void full_op(std::string filename){
+    BMP bitmap = BMP();
+    bitmap.readFromFile(filename);
+    MBT mapaBit = MBT(bitmap);
+    mapaBit.writeToFile("PID_OUT.mbt");
+    mapaBit.readFromFile("PID_OUT.mbt");
+    mapaBit.changeColorSpace(MBT::ColorSpace::YUV);
+    Quantization q;
+    std::vector<Pixel> palette = q.medianCut2ndAnd3rdChannels(&mapaBit, 256);
+    mapaBit.setPalette(palette);
+    bitmap = mapaBit.constructBMP();
+    bitmap.writeToFile("PID_OUT.bmp");
+}
+
+void write_op(std::string filename){
+    BMP bitmap = BMP();
+    bitmap.readFromFile(filename);
+    MBT mapaBit = MBT(bitmap);
+    mapaBit.writeToFile("PID_OUT.mbt");
+}
+
+void read_op(std::string filename){
+    BMP bitmap = BMP();
+    MBT mapaBit = MBT();
+    mapaBit.readFromFile(filename);
+    mapaBit.changeColorSpace(MBT::ColorSpace::YUV);
+    Quantization q;
+    std::vector<Pixel> palette = q.medianCut2ndAnd3rdChannels(&mapaBit, 256);
+    mapaBit.setPalette(palette);
+    bitmap = mapaBit.constructBMP();
+    bitmap.writeToFile("PID_OUT.bmp");
+}
 
 /* C++ Links
 https://stackoverflow.com/questions/11747954/c-inheritance-in-separate-files-using-include-and-inclusion-guards
