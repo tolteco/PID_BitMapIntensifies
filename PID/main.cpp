@@ -6,6 +6,8 @@
 #include "PIDMath.h"
 #include "pixel.h"
 #include "image.h"
+#include "mapadebits.h"
+#include "bitmap.h"
 
 #define OMP_THREADS 4
 
@@ -18,38 +20,6 @@ void full_op(std::string filename);
 void write_op(std::string filename);
 void read_op(std::string filename);
 
-void test7(){
-    std::string name = "Tucano.bmp";
-    BMP imag = BMP();
-    imag.readFromFile(name);
-    MBT newImag = MBT(imag);
-    newImag.writeToFile("out.mbt");
-    newImag.readFromFile("out.mbt");
-    newImag.changeColorSpace(MBT::ColorSpace::YUV);
-    Quantization q;
-    std::vector<Pixel> palette = q.medianCut2ndAnd3rdChannels(&newImag, 256);
-    newImag.setPalette(palette);
-    imag = newImag.constructBMP();
-    imag.writeToFile("out.bmp");
-
-    return;
-}
-
-void test8(){
-    MBT newImag = MBT();
-    newImag.readFromFile("out.mbt");
-    //newImag.changeColorSpace(MBT::ColorSpace::RGB);
-    Quantization q;
-    std::vector<Pixel> palette = q.medianCut2ndAnd3rdChannels(&newImag, 256);
-    newImag.setPalette(palette);
-    BMP imag = BMP();
-    newImag.changeColorSpace(MBT::ColorSpace::RGB);
-    imag = newImag.constructBMP();
-    imag.writeToFile("out.bmp");
-
-    return;
-}
-
 int main(int argc, char *argv[]) {
     if (omp_get_max_threads() > OMP_THREADS)
         omp_set_num_threads(OMP_THREADS);
@@ -61,9 +31,9 @@ int main(int argc, char *argv[]) {
         if (option == FULL_ARG){
             full_op(file);
         } else if (option == WRITE_MBT_ARG){
-            full_op(file);
+            write_op(file);
         } else if (option == READ_MBT_ARG){
-            full_op(file);
+            read_op(file);
         } else {
             valid_input_text();
         }
@@ -73,9 +43,6 @@ int main(int argc, char *argv[]) {
     } else {
         valid_input_text();
     }
-
-    //Ou faz o teste manualmente
-    //test8();
 
     return 0;
 }

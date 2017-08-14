@@ -14,21 +14,10 @@ class Pixel{
         Pixel(const Pixel &old);
         virtual ~Pixel() {};
 
-        void set1st (unsigned char new1st);
-        void set2nd (unsigned char new2nd);
-        void set3rd (unsigned char new3rd);
-        unsigned char get1st();
-        unsigned char get2nd();
-        unsigned char get3rd();
+        unsigned char get1st() const;
+        unsigned char get2nd() const;
+        unsigned char get3rd() const;
 
-        /// Operators
-        Pixel& operator++(); //++Pixel
-        Pixel  operator++(int); //Pixel++
-        Pixel& operator--(); //--Pixel
-        Pixel  operator--(int); //Pixel--
-        Pixel  operator+(const Pixel& b); //this + b
-        Pixel  operator-(const Pixel& b); //this - b
-        Pixel  operator*(const Pixel& b); //this - b
         bool  operator==(const Pixel& b); //this == b
 
         //NAO deve ser feito sobrecarda dos operadores "<", ">", etc;
@@ -39,11 +28,6 @@ class Pixel{
         void channelSwap(unsigned char chnl1, unsigned char chnl2);
         bool moreThan(Pixel b, char channel);
         bool lessThan(Pixel b, char channel);
-        static bool moreThan(Pixel a, Pixel b, char channel);
-        static bool lessThan(Pixel a, Pixel b, char channel);
-
-    friend std::ostream& operator<<(std::ostream &os, Pixel const &m);
-
     private:
         unsigned char first;
         unsigned char second;

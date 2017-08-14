@@ -10,17 +10,6 @@
 
 #define LOG_PRINT 1
 
-class MatrixOperation{
-    public:
-        ~MatrixOperation() {};
-
-        void transposeMatrix (Pixel* src, Pixel* dst, const unsigned int lines, const unsigned int columns);
-        void multiply(double mult[3][3], Pixel* mat, const unsigned int columns);
-        void multiplySum(double mult[3][3], double sum[3], Pixel* mat, const unsigned int columns);
-    private:
-
-};
-
 class MiscMath{
 public:
     unsigned int roundUpToNearestMultiple(unsigned int num, unsigned int multiple);
